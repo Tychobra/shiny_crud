@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+data/provided
+config.yml
+*.Rdata
+.env
+
