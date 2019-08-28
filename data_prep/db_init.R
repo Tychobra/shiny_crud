@@ -1,6 +1,6 @@
 library(RSQLite)
 #library(DBI)
-library(config)
+#library(config)
 library(tibble)
 
 # Set the configuration environment to work with either the development (default) 
@@ -34,7 +34,8 @@ create_mtcars_query = "CREATE TABLE mtcars (
   created_at                      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_by                      TEXT,
   modified_at                     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  modified_by                     TEXT
+  modified_by                     TEXT,
+  is_deleted                      BOOLEAN
 )"
 
 # dbExecute() executes a SQL statement with a connection object
@@ -66,4 +67,4 @@ DBI::dbWriteTable(
 dbListTables(conn)
 
 # MUST disconnect from SQLite before continuing
-DBI::dbDisconnect(conn)
+dbDisconnect(conn)
