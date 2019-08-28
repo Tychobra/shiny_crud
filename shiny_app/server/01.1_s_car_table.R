@@ -12,11 +12,15 @@ observe({
   out <- conn %>%
     tbl('mtcars') %>%
     collect() %>%
+    mutate(
+      created_at = as.POSIXct(created_at, tz = "UTC"),
+      modified_at = as.POSIXct(modified_at, tz = "UTC")
+    ) %>%
     group_by(id) %>%
     filter(modified_at == max(modified_at)) %>%
     ungroup() %>%
     arrange(desc(modified_at))
-  
+
   car_data(out)
 })
 
@@ -37,7 +41,7 @@ observeEvent(car_filter(), {
   out <- car_filter()
   
   out <- out %>%
-    select(-uid, -id, -is_deleted)
+    select(-uid, -id, -is_deleted) 
   
   if (session$userData$email == 'tycho.brahe@tychobra.com') {
     if (nrow(out) == 0) {
@@ -87,7 +91,16 @@ output$car_table <- renderDT({
         list(targets = 0, orderable = FALSE)
       )
     )
-  )
+  ) %>%
+    formatDate(
+      columns = c("Created At", "Modified At"),
+      # params = list(
+      #   year = 'numeric', 
+      #   month = 'long', 
+      #   day = 'numeric'
+      # )
+      method = 'toLocaleString'
+    )
 }, server = TRUE)
 
 car_table_proxy <- DT::dataTableProxy('car_table')
