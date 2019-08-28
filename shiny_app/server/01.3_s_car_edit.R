@@ -143,8 +143,10 @@ edit_car_dat <- reactive({
 validate_edit <- eventReactive(input$submit_edit, {
   dat <- edit_car_dat()
   
-  dat$modified_at <- NULL
+  dat$modified_at <- as.character(tychobratools::time_now_utc())
   dat$modified_by <- session$userData$email
+  
+  dat$created_at <- as.character(dat$created_at)
   
   dat
 })

@@ -38,6 +38,7 @@ car_delete_prep <- reactive({
   dat$is_deleted <- TRUE
   dat$uid <- NULL
   dat$modified_at <- NULL
+  dat$created_at <- as.character(dat$created_at)
   
   dat
 })

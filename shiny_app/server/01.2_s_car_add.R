@@ -123,10 +123,10 @@ validate_add <- eventReactive(input$submit_add, {
   user_email <- session$userData$email
   
   dat$id <- digest::digest(c(dat, runif(1)))
-  dat$modified_at <- NULL
   
   dat$created_by <- user_email
-  dat$modified_by <- user_email
+  # dat$modified_by <- user_email
+  dat$modified_by <- NULL
   
   dat
 })
