@@ -28,3 +28,8 @@ names_map <- data.frame(
                     'Created By', 'Modified At', 'Modified By'),
   stringsAsFactors = FALSE
 )
+
+
+shiny::onStop(function() {
+  dbDisconnect(conn)
+})

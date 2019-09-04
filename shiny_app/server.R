@@ -7,10 +7,4 @@ server <- function(input, output, session) {
   source('server/01.3_s_car_edit.R', local = TRUE)
   source('server/01.4_s_car_delete.R', local = TRUE)
   
-  
-  try({
-    shiny::onStop(function() {
-      dbDisconnect(conn)
-    })
-  })
 }
