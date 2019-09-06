@@ -7,4 +7,5 @@ data/provided
 config.yml
 *.Rdata
 .env
+logs/
 
