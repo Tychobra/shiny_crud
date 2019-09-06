@@ -1,6 +1,7 @@
 library(shiny)
 library(DT)
 library(dplyr)
+library(dbplyr)
 library(RSQLite)
 library(shinyjs)
 library(shinycssloaders)
@@ -8,6 +9,7 @@ library(shinyWidgets)
 library(shinydashboard)
 library(tychobratools)
 library(lubridate)
+library(shinylogs)
 
 conn <- dbConnect(RSQLite::SQLite(), 'data/mtcars.sqlite')
 
