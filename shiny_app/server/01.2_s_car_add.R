@@ -1,5 +1,6 @@
 observeEvent(input$add_car, {
   req(session$userData$email == 'tycho.brahe@tychobra.com')
+
   showModal(
     modalDialog(
       fluidRow(
@@ -121,51 +122,36 @@ new_car_dat <- reactive({
 validate_add <- eventReactive(input$submit_add, {
   dat <- new_car_dat()
   user_email <- session$userData$email
-  
+
   dat$id <- digest::digest(c(dat, runif(1)))
-  
+
   dat$created_by <- user_email
   # dat$modified_by <- user_email
   dat$modified_by <- NULL
-  
+
   dat
 })
 
 observeEvent(validate_add(), {
   removeModal()
   dat <- validate_add()
-  
+
   tryCatch({
-    
+
     tychobratools::add_row(
       conn,
       "mtcars",
       dat
     )
-    
-    # Show confirmation message
-    session$sendCustomMessage(
-      "show_toast",
-      message = list(
-        type = "success",
-        title = "Car Successfully Added!",
-        message = NULL
-      )
-    )
-    
+
+
     car_trigger(car_trigger() + 1)
+    toastr_success("Car Successfully Added!")
   }, error = function(error) {
-    
-    session$sendCustomMessage(
-      "show_toast",
-      message = list(
-        type = "error",
-        title = "Error Adding Car!",
-        message = error
-      )
-    )
-    
+
+    toastr_error("Error Adding Car")
+
     print(error)
   })
-  
+
 })

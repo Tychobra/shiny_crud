@@ -1,14 +1,6 @@
 
 
-Shiny.addCustomMessageHandler(
-  "show_toast",
-  function(message) {
-    toastr[message.type](
-      message.title,
-      message.message
-    )
-  }
-)
+
 
 $(document).on("click", "#car_table .delete_btn", function() {
     Shiny.setInputValue("car_row_to_delete", this.id, { priority: "event"});

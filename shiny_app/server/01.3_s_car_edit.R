@@ -2,16 +2,16 @@ car_to_edit <- reactiveVal(NULL)
 
 observeEvent(input$car_row_to_edit, {
   row_num <- as.numeric(input$car_row_to_edit)
-  
+
   out <- car_filter()[row_num, ]
-  
+
   car_to_edit(out)
 }, priority = 1)
 
 observeEvent(input$car_row_to_edit, {
   req(car_to_edit(), session$userData$email == 'tycho.brahe@tychobra.com')
   hold <- car_to_edit()
-  
+
   showModal(
     modalDialog(
       fluidRow(
@@ -121,7 +121,7 @@ observeEvent(input$car_row_to_edit, {
 edit_car_dat <- reactive({
   hold <- car_to_edit()
   hold$uid <- NULL
-  
+
   new_vals <- list(
     'model' = input$edit_model,
     'mpg' = input$edit_mpg,
@@ -136,56 +136,40 @@ edit_car_dat <- reactive({
     'gear' = input$edit_gear,
     'carb' = input$edit_carb
   )
-  
+
   modifyList(hold, new_vals)
 })
 
 validate_edit <- eventReactive(input$submit_edit, {
   dat <- edit_car_dat()
-  
+
   dat$modified_at <- as.character(tychobratools::time_now_utc())
   dat$modified_by <- session$userData$email
-  
+
   dat$created_at <- as.character(dat$created_at)
-  
+
   dat
 })
 
 observeEvent(validate_edit(), {
   removeModal()
   dat <- validate_edit()
-  
+
   tryCatch({
-    
+
     tychobratools::add_row(
       conn,
       "mtcars",
       dat
     )
-    
-    # display a successful toast message
-    session$sendCustomMessage(
-      "show_toast",
-      message = list(
-        type = "success",
-        title = "Car Successfully edited!",
-        message = NULL
-      )
-    )
-    
+
+
     car_trigger(car_trigger() + 1)
+    toastr_success("Car Successfully Edited")
   }, error = function(error) {
-    
-    session$sendCustomMessage(
-      "show_toast",
-      message = list(
-        type = "error",
-        title = "Error Editing Car",
-        message = error
-      )
-    )
-    
-    #print("[ TYCHOBRA ERROR ] location edit error")
+
+    toastr_error("Error Editing Car")
+
     print(error)
   })
 })
