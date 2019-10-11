@@ -10,10 +10,22 @@ library(tychobratools)
 library(lubridate)
 library(shinytoastr)
 
+source("modules/cars_table_module.R", local = TRUE)
+source("modules/car_edit_module.R", local = TRUE)
+
+
+
 conn <- dbConnect(
   RSQLite::SQLite(),
-  'data/mtcars.sqlite'
+  'data/mtcars.sqlite3'
 )
+
+shiny::onStop(function() {
+  dbDisconnect(conn)
+})
+
+
+
 
 # Turn off scientific notation
 options(scipen = 999)
@@ -34,6 +46,4 @@ names_map <- data.frame(
 )
 
 
-shiny::onStop(function() {
-  dbDisconnect(conn)
-})
+
