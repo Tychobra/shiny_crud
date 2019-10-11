@@ -12,7 +12,7 @@ library(shinytoastr)
 
 source("modules/cars_table_module.R", local = TRUE)
 source("modules/car_edit_module.R", local = TRUE)
-
+source("modules/car_delete_module.R", local = TRUE)
 
 
 conn <- dbConnect(
