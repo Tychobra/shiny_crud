@@ -87,27 +87,31 @@ cars_table_module <- function(input, output, session) {
     out <- car_filter()
 
     out <- out %>%
-      select(-uid, -id, -is_deleted)
+      select(-uid, -is_deleted)
 
     if (session$userData$email == 'tycho.brahe@tychobra.com') {
       if (nrow(out) == 0) {
         actions <- character(0)
       } else {
-        rows <- 1:nrow(out)
+        ids <- out$id
 
-        actions <- paste0(
+        actions <- purrr::map_chr(ids, function(id_) {
+          paste0(
           '<div class="btn-group" style="width: 75px;" role="group" aria-label="Basic example">
-            <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit Car" id = ', rows, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
-            <button class="btn btn-danger btn-sm delete_btn" data-toggle="tooltip" data-placement="top" title="Delete Car" id = ', rows, ' style="margin: 0"><i class="fa fa-trash-o"></i></button></div>'
-        )
+            <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit Car" id = ', id_, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
+            <button class="btn btn-danger btn-sm delete_btn" data-toggle="tooltip" data-placement="top" title="Delete Car" id = ', id_, ' style="margin: 0"><i class="fa fa-trash-o"></i></button></div>'
+          )
+        })
 
         out <- cbind(
-          tibble(`Edit/Delete` = actions),
+          tibble(" " = actions),
           out
         )
       }
     }
 
+    out <- out %>%
+      select(-id)
     # Change column names from variable -> human readable
     names(out) <- convert_column_names(names(out), names_map)
 
@@ -159,40 +163,43 @@ cars_table_module <- function(input, output, session) {
     modal_trigger = reactive({input$add_car})
   )
 
-  car_to_edit <- reactiveVal(NULL)
-
-  observeEvent(input$car_row_to_edit, {
-    row_num <- as.numeric(input$car_row_to_edit)
-
-    out <- car_filter()[row_num, ]
-
-    car_to_edit(out)
-  }, priority = 1)
-
+  car_to_edit <- eventReactive(input$car_id_to_edit, {
+    
+    car_filter() %>%
+      filter(id == input$car_id_to_edit)
+  })
+  
   callModule(
     car_edit_module,
     "edit_car",
     modal_title = "Edit Car",
     car_to_edit = car_to_edit,
-    modal_trigger = reactive({input$car_row_to_edit})
+    modal_trigger = reactive({input$car_id_to_edit})
   )
   
-  car_to_delete <- reactiveVal(NULL)
+  # car_to_delete <- reactiveVal(NULL)
+  # 
+  # observeEvent(input$car_row_to_delete, {
+  #   row_num <- as.numeric(input$car_row_to_delete)
+  #   
+  #   out <- car_filter()[row_num, ]
+  #   
+  #   car_to_delete(out)
+  # }, priority = 1)
   
-  observeEvent(input$car_row_to_delete, {
-    row_num <- as.numeric(input$car_row_to_delete)
+  #NEW
+  car_to_delete <- eventReactive(input$car_id_to_delete, {
     
-    out <- car_filter()[row_num, ]
-    
-    car_to_delete(out)
-  }, priority = 1)
-  
+    car_filter() %>%
+      filter(id == input$car_id_to_delete)
+  })
+
   callModule(
     car_delete_module,
     "delete_car",
     modal_title = "Delete Car",
     car_to_delete = car_to_delete,
-    modal_trigger = reactive({input$car_row_to_delete})
+    modal_trigger = reactive({input$car_id_to_delete})
   )
   
 }
