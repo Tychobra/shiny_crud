@@ -177,17 +177,6 @@ cars_table_module <- function(input, output, session) {
     modal_trigger = reactive({input$car_id_to_edit})
   )
   
-  # car_to_delete <- reactiveVal(NULL)
-  # 
-  # observeEvent(input$car_row_to_delete, {
-  #   row_num <- as.numeric(input$car_row_to_delete)
-  #   
-  #   out <- car_filter()[row_num, ]
-  #   
-  #   car_to_delete(out)
-  # }, priority = 1)
-  
-  #NEW
   car_to_delete <- eventReactive(input$car_id_to_delete, {
     
     car_filter() %>%
