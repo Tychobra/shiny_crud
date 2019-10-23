@@ -8,4 +8,5 @@ config.yml
 *.Rdata
 .env
 .DS_store
-
+rsconnect/
+logs/
