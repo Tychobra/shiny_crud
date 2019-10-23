@@ -123,7 +123,6 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
   edit_car_dat <- reactive({
     hold <- car_to_edit()
 
-
     new_vals <- list(
       'model' = input$model,
       'mpg' = input$mpg,
