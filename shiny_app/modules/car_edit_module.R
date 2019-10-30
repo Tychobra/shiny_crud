@@ -108,13 +108,14 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
         title = modal_title,
         size = 'm',
         footer = list(
+          modalButton('Cancel'),
           actionButton(
             ns('submit'),
             'Submit',
-            style="color: #fff; background-color: #07b710; border-color: #07b710",
+            class = "btn-success",
+            style="color: #fff;",
             icon = icon("plus")
-          ),
-          modalButton('Cancel')
+          )
         )
       )
     )
@@ -181,7 +182,7 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
       )
 
       session$userData$db_trigger(session$userData$db_trigger() + 1)
-      tychobratools::show_toast("success", "Car Successfully Edited")
+      tychobratools::show_toast("success", paste0(modal_title, " Success"))
     }, error = function(error) {
 
       tychobratools::show_toast("error", "Error Editing Car")

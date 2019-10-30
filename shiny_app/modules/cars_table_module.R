@@ -20,7 +20,8 @@ cars_table_module_ui <- function(id) {
         actionButton(
           ns("add_car"),
           "Add",
-          style = "color: #fff; background-color: #07b710; border-color: #07b710",
+          class = "btn-success",
+          style = "color: #fff;",
           icon = icon('plus'),
           width = '100%'
         ) %>% hidden(),
@@ -136,7 +137,17 @@ cars_table_module <- function(input, output, session) {
       extensions = c("Buttons"),
       options = list(
         scrollX = TRUE,
-        dom = 'Blftip',
+        dom = 'Bftip',
+        buttons = list(
+          list(
+            extend = "excel",
+            text = "Download",
+            title = paste0("golf_carts-", Sys.Date()),
+            exportOptions = list(
+              columns = 1:(length(out) - 1)
+            )
+          )
+        ),
         columnDefs = list(
           list(targets = 0, orderable = FALSE)
         )
@@ -144,14 +155,10 @@ cars_table_module <- function(input, output, session) {
     ) %>%
       formatDate(
         columns = c("Created At", "Modified At"),
-        # params = list(
-        #   year = 'numeric',
-        #   month = 'long',
-        #   day = 'numeric'
-        # )
         method = 'toLocaleString'
       )
-  }, server = TRUE)
+
+  })
 
   car_table_proxy <- DT::dataTableProxy('car_table')
 
@@ -164,11 +171,11 @@ cars_table_module <- function(input, output, session) {
   )
 
   car_to_edit <- eventReactive(input$car_id_to_edit, {
-    
+
     car_filter() %>%
       filter(id == input$car_id_to_edit)
   })
-  
+
   callModule(
     car_edit_module,
     "edit_car",
@@ -176,9 +183,9 @@ cars_table_module <- function(input, output, session) {
     car_to_edit = car_to_edit,
     modal_trigger = reactive({input$car_id_to_edit})
   )
-  
+
   car_to_delete <- eventReactive(input$car_id_to_delete, {
-    
+
     car_filter() %>%
       filter(id == input$car_id_to_delete)
   })
@@ -190,5 +197,5 @@ cars_table_module <- function(input, output, session) {
     car_to_delete = car_to_delete,
     modal_trigger = reactive({input$car_id_to_delete})
   )
-  
+
 }
