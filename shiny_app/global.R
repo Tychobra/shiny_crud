@@ -1,6 +1,7 @@
 library(shiny)
 library(DT)
 library(dplyr)
+library(DBI)
 library(RSQLite)
 library(shinyjs)
 library(shinycssloaders)
@@ -14,10 +15,9 @@ source("modules/cars_table_module.R", local = TRUE)
 source("modules/car_edit_module.R", local = TRUE)
 source("modules/car_delete_module.R", local = TRUE)
 
-
 conn <- dbConnect(
   RSQLite::SQLite(),
-  'data/mtcars.sqlite3'
+  dbname = 'data/mtcars.sqlite3'
 )
 
 shiny::onStop(function() {
