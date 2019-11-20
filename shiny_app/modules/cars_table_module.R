@@ -39,7 +39,7 @@ cars_table_module_ui <- function(id) {
       )
     ),
     tags$script(src = "cars_table_module.js"),
-    tags$script(paste0("cars_table_module_js('", ns(''), "')"))
+    tags$script(paste0("cars_table_module_js('", id, "')"))
   )
 }
 
