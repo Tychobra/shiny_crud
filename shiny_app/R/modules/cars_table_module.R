@@ -52,7 +52,7 @@ cars_table_module <- function(input, output, session) {
 
 
   # Trigger to reload data from database
-  car_trigger <- reactiveVal(0)
+  # car_trigger <- reactiveVal(0)
 
   car_data <- reactive({
     session$userData$db_trigger()
