@@ -10,3 +10,4 @@ config.yml
 .DS_store
 rsconnect/
 logs/
+*.sqlite3
