@@ -7,6 +7,9 @@
 #'
 #' @return
 #'
+#' @importFrom shiny showModal modalDialog fluidRow column textInput numericInput selectInput modalButton actionButton reactive
+#' @importClassesFrom digest digest
+#' 
 car_edit_module <- function(input, output, session, modal_title, car_to_edit, modal_trigger) {
   ns <- session$ns
 
