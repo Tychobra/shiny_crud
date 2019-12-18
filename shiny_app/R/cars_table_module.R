@@ -32,6 +32,7 @@ cars_table_module_ui <- function(id) {
     fluidRow(
       column(
         width = 12,
+        ##Why is the h3 title not visible
         title = h3("Motor Trend Car Road Tests Table", align = 'center'),
         DTOutput(ns('car_table')) %>% withSpinner(),
         br(),
@@ -46,6 +47,7 @@ cars_table_module_ui <- function(id) {
 
 
 cars_table_module <- function(input, output, session) {
+  ##Don't understand what this is doing.  Specifically, what is "shinyjs::show("add_car")" doing?
   observe({
     if (session$userData$email == "tycho.brahe@tychobra.com") shinyjs::show("add_car")
   })
@@ -60,6 +62,7 @@ cars_table_module <- function(input, output, session) {
     session$userData$conn %>%
       tbl('mtcars') %>%
       collect() %>%
+      ## Why is this not mutating whole table or is it?
       mutate(
         created_at = as.POSIXct(created_at, tz = "UTC"),
         modified_at = as.POSIXct(modified_at, tz = "UTC")
@@ -70,7 +73,7 @@ cars_table_module <- function(input, output, session) {
       arrange(desc(modified_at))
 
   })
-
+ ##Filter for only not deleted data
   car_filter <- reactive({
     req(car_data())
 
