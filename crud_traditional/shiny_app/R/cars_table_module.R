@@ -1,3 +1,23 @@
+#' cars_table_module.R
+#'
+#' The module for displaying the mtcars datatable
+#' 
+#' @param ns The namespace for this module
+#' 
+#' @param id The id for this module
+#' 
+#' @param input The input(s) used in the Shiny application
+#' 
+#' @param ouput The output(s) used in the Shiny application 
+#' 
+#' @param session The session for the Shiny application instance
+#' 
+#' @importFrom shiny NS tagList fluidRow column actionButton br h3 DTOutput 
+#'
+#' @importFrom shinyjs hidden show
+#' 
+#' @importFrom shinycssloaders withSpinner 
+#'
 cars_table_module_css <- function(ns) {
 
   paste0("#", ns('car_table'), " {
@@ -44,8 +64,6 @@ cars_table_module_ui <- function(id) {
   )
 }
 
-
-
 cars_table_module <- function(input, output, session) {
   ##Don't understand what this is doing.  Specifically, what is "shinyjs::show("add_car")" doing?
   observe({
@@ -58,7 +76,9 @@ cars_table_module <- function(input, output, session) {
 
   car_data <- reactive({
     session$userData$db_trigger()
-
+    
+    browser()
+    
     session$userData$conn %>%
       tbl('mtcars') %>%
       collect() %>%
@@ -67,7 +87,7 @@ cars_table_module <- function(input, output, session) {
         created_at = as.POSIXct(created_at, tz = "UTC"),
         modified_at = as.POSIXct(modified_at, tz = "UTC")
       ) %>%
-      group_by(id) %>%
+      group_by(uid) %>%
       filter(modified_at == max(modified_at)) %>%
       ungroup() %>%
       arrange(desc(modified_at))
@@ -79,8 +99,8 @@ cars_table_module <- function(input, output, session) {
 
     out <- car_data()
 
-    out <- out %>%
-      filter(is_deleted == FALSE)
+    # out <- out %>%
+    #   filter(is_deleted == FALSE)
 
     out
   })
@@ -90,14 +110,14 @@ cars_table_module <- function(input, output, session) {
   observeEvent(car_filter(), {
     out <- car_filter()
 
-    out <- out %>%
-      select(-uid, -is_deleted)
+    # out <- out %>%
+    #   select(-uid) , -is_deleted)
 
     if (session$userData$email == 'tycho.brahe@tychobra.com') {
       if (nrow(out) == 0) {
         actions <- character(0)
       } else {
-        ids <- out$id
+        ids <- out$uid
 
         actions <- purrr::map_chr(ids, function(id_) {
           paste0(
@@ -114,8 +134,6 @@ cars_table_module <- function(input, output, session) {
       }
     }
 
-    out <- out %>%
-      select(-id)
     # Change column names from variable -> human readable
     names(out) <- convert_column_names(names(out), names_map)
 
@@ -176,7 +194,7 @@ cars_table_module <- function(input, output, session) {
   car_to_edit <- eventReactive(input$car_id_to_edit, {
 
     car_filter() %>%
-      filter(id == input$car_id_to_edit)
+      filter(uid == input$car_id_to_edit)
   })
 
   callModule(
@@ -190,7 +208,7 @@ cars_table_module <- function(input, output, session) {
   car_to_delete <- eventReactive(input$car_id_to_delete, {
 
     car_filter() %>%
-      filter(id == input$car_id_to_delete)
+      filter(uid == input$car_id_to_delete)
   })
 
   callModule(
