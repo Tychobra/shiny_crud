@@ -15,11 +15,6 @@ cars_table_module_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
-    tags$head(
-      tags$style(
-        cars_table_module_css(ns)
-      )
-    ),
     fluidRow(
       column(
         width = 2,
@@ -53,13 +48,11 @@ cars_table_module_ui <- function(id) {
 cars_table_module <- function(input, output, session) {
 
   # read in "mtcars" table from the database
-  car_data <- reactive({
+  cars <- reactive({
     session$userData$db_trigger()
 
     session$userData$conn %>%
       tbl('mtcars') %>%
-      filter(is_deleted == FALSE) %>%
-      select(-is_deleted) %>%
       collect() %>%
       mutate(
         created_at = as.POSIXct(created_at, tz = "UTC"),
@@ -72,8 +65,8 @@ cars_table_module <- function(input, output, session) {
 
   initial_load <- reactiveVal(TRUE)
 
-  car_table_prep <- eventReactive(car_filter(), {
-    out <- car_filter()
+  car_table_prep <- eventReactive(cars(), {
+    out <- cars()
 
     ids <- out$uid
 
@@ -86,16 +79,17 @@ cars_table_module <- function(input, output, session) {
       )
     })
 
+    # remove the uid column.  We don't want to show this column to the user
+    out <- out %>%
+      select(-uid)
+
     # set the row action buttons to the first column of the mtcars table
     out <- cbind(
       tibble(" " = actions),
       out
     )
 
-    # Change column names from variable -> human readable
-    names(out) <- convert_column_names(names(out), names_map)
-
-    if (isTRUE(car_table_prep())) {
+    if (isTRUE(initial_load())) {
       # loading data into the table for the first time, so we render the entire table
       # rather than using a DT proxy
       initial_load(FALSE)
@@ -117,6 +111,7 @@ cars_table_module <- function(input, output, session) {
       out,
       rownames = FALSE,
       selection = "none",
+      class = "compact stripe row-border nowrap",
       # Escape the HTML in all except 1st column (which has the buttons)
       escape = -1,
       extensions = c("Buttons"),
@@ -127,7 +122,7 @@ cars_table_module <- function(input, output, session) {
           list(
             extend = "excel",
             text = "Download",
-            title = paste0("golf_carts-", Sys.Date()),
+            title = paste0("mtcars-", Sys.Date()),
             exportOptions = list(
               columns = 1:(length(out) - 1)
             )
@@ -139,7 +134,7 @@ cars_table_module <- function(input, output, session) {
       )
     ) %>%
       formatDate(
-        columns = c("Created At", "Modified At"),
+        columns = c("created_at", "modified_at"),
         method = 'toLocaleString'
       )
 
@@ -157,7 +152,7 @@ cars_table_module <- function(input, output, session) {
 
   car_to_edit <- eventReactive(input$car_id_to_edit, {
 
-    car_filter() %>%
+    cars() %>%
       filter(uid == input$car_id_to_edit)
   })
 
@@ -171,7 +166,7 @@ cars_table_module <- function(input, output, session) {
 
   car_to_delete <- eventReactive(input$car_id_to_delete, {
 
-    car_filter() %>%
+    cars() %>%
       filter(uid == input$car_id_to_delete)
   })
 

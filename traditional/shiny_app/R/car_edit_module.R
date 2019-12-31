@@ -35,13 +35,11 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
               min = 0,
               step = 0.1
             ),
-            numericInput(
-              ns('cyl'),
-              'Cylinders',
-              value = if (is.null(hold)) "" else hold$cyl,
-              min = 0,
-              max = 20,
-              step = 1
+            selectInput(
+              ns('am'),
+              'Transmission',
+              choices = c('Automatic', 'Manual'),
+              selected = if (is.null(hold)) "" else hold$am
             ),
             numericInput(
               ns('disp'),
@@ -87,11 +85,13 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
               choices = c('Straight', 'V-shaped'),
               selected = if (is.null(hold)) "" else hold$vs
             ),
-            selectInput(
-              ns('am'),
-              'Transmission',
-              choices = c('Automatic', 'Manual'),
-              selected = if (is.null(hold)) "" else hold$am
+            numericInput(
+              ns('cyl'),
+              'Cylinders',
+              value = if (is.null(hold)) "" else hold$cyl,
+              min = 0,
+              max = 20,
+              step = 1
             ),
             numericInput(
               ns('gear'),

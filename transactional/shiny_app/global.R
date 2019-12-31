@@ -11,9 +11,6 @@ library(tychobratools)
 library(lubridate)
 library(shinytoastr)
 
-source("R/cars_table_module.R", local = TRUE)
-source("R/car_edit_module.R", local = TRUE)
-source("R/car_delete_module.R", local = TRUE)
 
 conn <- dbConnect(
   RSQLite::SQLite(),

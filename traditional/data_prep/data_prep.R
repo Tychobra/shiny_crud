@@ -9,11 +9,14 @@ mtcars <- rownames_to_column(mtcars, var = 'model')
 
 # Converting Weight (i.e. 'wt') from 1000's of lbs to lbs
 mtcars$wt <- mtcars$wt * 1000
-  
+
 
 # Converting binary values to intended, character values
 mtcars <- mtcars %>%
-  mutate(vs = ifelse(vs == 0, 'V-shaped', 'Straight'),
-         am = ifelse(am == 0, 'Automatic', 'Manual'))
+  mutate(
+    vs = ifelse(vs == 0, 'V-shaped', 'Straight'),
+    am = ifelse(am == 0, 'Automatic', 'Manual')
+  )
 
-saveRDS(mtcars, file = 'crud_traditional/data_prep/prepped/mtcars.RDS')
+
+saveRDS(mtcars, file = 'data_prep/prepped/mtcars.RDS')
