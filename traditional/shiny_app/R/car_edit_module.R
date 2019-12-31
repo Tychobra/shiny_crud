@@ -3,18 +3,19 @@
 #'
 #' detail goes here
 #'
-#' @param
+#' @param modal_title string - the title for the modal
+#' @param car_to_edit reactive returning a 1 row data frame of the car to edit
+#' from the "mt_cars" table
+#' @param model_trigger reactive trigger to open the modal
 #'
-#' @return
 #'
 #' @importFrom shiny showModal modalDialog fluidRow column textInput numericInput selectInput modalButton actionButton reactive
 #' @importClassesFrom digest digest
-#' 
+#'
 car_edit_module <- function(input, output, session, modal_title, car_to_edit, modal_trigger) {
   ns <- session$ns
 
   observeEvent(modal_trigger(), {
-    req(session$userData$email == 'tycho.brahe@tychobra.com')
     hold <- car_to_edit()
 
     showModal(
