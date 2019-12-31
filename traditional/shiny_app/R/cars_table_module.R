@@ -1,30 +1,16 @@
 #' cars_table_module.R
 #'
 #' The module for displaying the mtcars datatable
-#' 
-#' @param ns The namespace for this module
-#' 
+#'
 #' @param id The id for this module
-#' 
-#' @param input The input(s) used in the Shiny application
-#' 
-#' @param ouput The output(s) used in the Shiny application 
-#' 
-#' @param session The session for the Shiny application instance
-#' 
-#' @importFrom shiny NS tagList fluidRow column actionButton br h3 DTOutput 
 #'
-#' @importFrom shinyjs hidden show
-#' 
-#' @importFrom shinycssloaders withSpinner 
 #'
-cars_table_module_css <- function(ns) {
-
-  paste0("#", ns('car_table'), " {
-    white-space: nowrap;
-  }")
-}
-
+#' @importFrom shiny NS tagList fluidRow column actionButton br
+#' @importFrom DT DTOutput
+#' @importFrom htmltools tags
+#' @importFrom shinycssloaders withSpinner
+#'
+#'
 cars_table_module_ui <- function(id) {
   ns <- NS(id)
 
@@ -44,105 +30,83 @@ cars_table_module_ui <- function(id) {
           style = "color: #fff;",
           icon = icon('plus'),
           width = '100%'
-        ) %>% hidden(),
-        br(),
-        br()
+        ),
+        tags$br(),
+        tags$br()
       )
     ),
     fluidRow(
       column(
         width = 12,
-        ##Why is the h3 title not visible
-        title = h3("Motor Trend Car Road Tests Table", align = 'center'),
-        DTOutput(ns('car_table')) %>% withSpinner(),
-        br(),
-        br()
+        title = "Motor Trend Car Road Tests",
+        DTOutput(ns('car_table')) %>%
+          withSpinner(),
+        tags$br(),
+        tags$br()
       )
     ),
     tags$script(src = "cars_table_module.js"),
-    tags$script(paste0("cars_table_module_js('", id, "')"))
+    tags$script(paste0("cars_table_module_js('", ns(''), "')"))
   )
 }
 
 cars_table_module <- function(input, output, session) {
-  ##Don't understand what this is doing.  Specifically, what is "shinyjs::show("add_car")" doing?
-  observe({
-    if (session$userData$email == "tycho.brahe@tychobra.com") shinyjs::show("add_car")
-  })
 
-
-  # Trigger to reload data from database
-  # car_trigger <- reactiveVal(0)
-
+  # read in "mtcars" table from the database
   car_data <- reactive({
     session$userData$db_trigger()
-    
-    browser()
-    
+
     session$userData$conn %>%
       tbl('mtcars') %>%
+      filter(is_deleted == FALSE) %>%
+      select(-is_deleted) %>%
       collect() %>%
-      ## Why is this not mutating whole table or is it?
       mutate(
         created_at = as.POSIXct(created_at, tz = "UTC"),
         modified_at = as.POSIXct(modified_at, tz = "UTC")
       ) %>%
-      group_by(uid) %>%
-      filter(modified_at == max(modified_at)) %>%
-      ungroup() %>%
       arrange(desc(modified_at))
 
   })
- ##Filter for only not deleted data
-  car_filter <- reactive({
-    req(car_data())
 
-    out <- car_data()
 
-    # out <- out %>%
-    #   filter(is_deleted == FALSE)
+  initial_load <- reactiveVal(TRUE)
 
-    out
-  })
-
-  car_table_prep <- reactiveVal(NULL)
-
-  observeEvent(car_filter(), {
+  car_table_prep <- eventReactive(car_filter(), {
     out <- car_filter()
 
-    # out <- out %>%
-    #   select(-uid) , -is_deleted)
+    ids <- out$uid
 
-    if (session$userData$email == 'tycho.brahe@tychobra.com') {
-      if (nrow(out) == 0) {
-        actions <- character(0)
-      } else {
-        ids <- out$uid
+    actions <- purrr::map_chr(ids, function(id_) {
+      paste0(
+        '<div class="btn-group" style="width: 75px;" role="group" aria-label="Basic example">
+          <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit" id = ', id_, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
+          <button class="btn btn-danger btn-sm delete_btn" data-toggle="tooltip" data-placement="top" title="Delete" id = ', id_, ' style="margin: 0"><i class="fa fa-trash-o"></i></button>
+        </div>'
+      )
+    })
 
-        actions <- purrr::map_chr(ids, function(id_) {
-          paste0(
-          '<div class="btn-group" style="width: 75px;" role="group" aria-label="Basic example">
-            <button class="btn btn-primary btn-sm edit_btn" data-toggle="tooltip" data-placement="top" title="Edit Car" id = ', id_, ' style="margin: 0"><i class="fa fa-pencil-square-o"></i></button>
-            <button class="btn btn-danger btn-sm delete_btn" data-toggle="tooltip" data-placement="top" title="Delete Car" id = ', id_, ' style="margin: 0"><i class="fa fa-trash-o"></i></button></div>'
-          )
-        })
-
-        out <- cbind(
-          tibble(" " = actions),
-          out
-        )
-      }
-    }
+    # set the row action buttons to the first column of the mtcars table
+    out <- cbind(
+      tibble(" " = actions),
+      out
+    )
 
     # Change column names from variable -> human readable
     names(out) <- convert_column_names(names(out), names_map)
 
-    if (is.null(car_table_prep())) {
-      car_table_prep(out)
+    if (isTRUE(car_table_prep())) {
+      # loading data into the table for the first time, so we render the entire table
+      # rather than using a DT proxy
+      initial_load(FALSE)
+      return(out)
     } else {
-      replaceData(car_table_proxy, out, resetPaging = FALSE, rownames = FALSE)
-    }
 
+      # table has already rendered, so use DT proxy to update the data in the
+      # table without rerendering the entire table
+      replaceData(car_table_proxy, out, resetPaging = FALSE, rownames = FALSE)
+
+    }
   })
 
   output$car_table <- renderDT({
