@@ -128,38 +128,34 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
   edit_car_dat <- reactive({
     hold <- car_to_edit()
 
-    new_vals <- list(
-      'model' = input$model,
-      'mpg' = input$mpg,
-      'cyl' = input$cyl,
-      'disp' = input$disp,
-      'hp' = input$hp,
-      'drat' = input$drat,
-      'wt' = input$wt,
-      'qsec' = input$qsec,
-      'vs' = input$vs,
-      'am' = input$am,
-      'gear' = input$gear,
-      'carb' = input$carb
+    out <- list(
+      uid = if (is.null(hold)) NA else hold$uid,
+      data = list(
+        "model" = input$model,
+        "mpg" = input$mpg,
+        "cyl" = input$cyl,
+        "disp" = input$disp,
+        "hp" = input$hp,
+        "drat" = input$drat,
+        "wt" = input$wt,
+        "qsec" = input$qsec,
+        "vs" = input$vs,
+        "am" = input$am,
+        "gear" = input$gear,
+        "carb" = input$carb
+      )
     )
 
-    new_vals$modified_by <- session$userData$email
-    new_vals$modified_at <- as.character(tychobratools::time_now_utc())
-
+    time_now <- as.character(tychobratools::time_now_utc())
+    out$data$modified_by <- session$userData$email
+    out$data$modified_at <- time_now
 
     if (is.null(hold)) {
       # adding a new car
-      out <- new_vals
-      out$created_at <- as.character(tychobratools::time_now_utc())
+
+      out$created_at <- time_now
       out$created_by <- session$userData$email
-      out$id <- digest::digest(new_vals)
-    } else {
 
-      new_vals$created_by <- hold$created_by
-      new_vals$created_at <- as.character(hold$created_at)
-
-      # editing an existing car
-      out <- modifyList(hold, new_vals)
     }
 
     out
@@ -178,12 +174,34 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
     dat <- validate_edit()
 
     tryCatch({
+      browser()
+      if (is.na(dat$uid)) {
+        # creating a new car
+        uid <- digest::digest(dat)
 
-      tychobratools::add_row(
-        session$userData$conn,
-        "mtcars",
-        dat
-      )
+        dbExecute(
+          session$userData$conn,
+          "INSERT INTO mtcars (uid, model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am,
+          gear, carb, modified_by, modified_at, created_by, created_at) VALUES
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9. $10, $11, $12, $13, $14, $15, $16, $17)",
+          params = c(
+            list(uid),
+            unname(dat$data)
+          )
+        )
+      } else {
+        # editing an existing car
+        dbExecute(
+          session$userData$conn,
+          "UPDATE mtcars SET model=$1, mpg=$2, cyl=$3, disp=$4, hp=$5, drat=$6,
+          wt=$7, qsec=$8, vs=$9, am=$10, gear=$11, carb=$12, modified_by=$13,
+          modified_at=$14 WHERE uid=$15",
+          params = c(
+            unname(dat$data),
+            list(dat$uid)
+          )
+        )
+      }
 
       session$userData$db_trigger(session$userData$db_trigger() + 1)
       tychobratools::show_toast("success", paste0(modal_title, " Success"))
