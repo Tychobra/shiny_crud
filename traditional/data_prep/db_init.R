@@ -10,7 +10,7 @@ conn <- dbConnect(
 # Create a query to prepare the 'mtcars' table with additional 'uid', 'id',
 # & the 4 created/modified columns
 create_mtcars_query = "CREATE TABLE mtcars (
-  uid                             TEXT,
+  uid                             TEXT PRIMARY KEY,
   model                           TEXT,
   mpg                             REAL,
   cyl                             REAL,
