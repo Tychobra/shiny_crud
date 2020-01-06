@@ -12,7 +12,7 @@ library(tibble)
 # db_config <- config::get(file = 'shiny_app/config.yml')
 
 # Create a connection object with SQLite
-conn <- dbConnect(RSQLite::SQLite(), 'shiny_app/data/mtcars.sqlite3')
+conn <- dbConnect(RSQLite::SQLite(), 'transactional/shiny_app/data/mtcars.sqlite3')
 
 # Create a query to prepare the 'mtcars' table with additional 'uid', 'id',
 # & the 4 created/modified columns
@@ -45,7 +45,7 @@ dbExecute(conn, "DROP TABLE IF EXISTS mtcars")
 dbExecute(conn, create_mtcars_query)
 
 # Read in the RDS file created in 'data_prep.R'
-dat <- readRDS("data_prep/prepped/mtcars.RDS")
+dat <- readRDS("transactional/data_prep/prepped/mtcars.RDS")
 
 # Create 'id' column in 'dat' dataframe
 ids <- lapply(1:nrow(dat), function(row_num) {
