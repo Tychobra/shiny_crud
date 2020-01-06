@@ -4,7 +4,7 @@ library(tibble)
 # Create a connection object with SQLite
 conn <- dbConnect(
   RSQLite::SQLite(),
-  "shiny_app/data/mtcars.sqlite3"
+  "traditional/shiny_app/data/mtcars.sqlite3"
 )
 
 # Create a query to prepare the 'mtcars' table with additional 'uid', 'id',
@@ -36,7 +36,7 @@ dbExecute(conn, "DROP TABLE IF EXISTS mtcars")
 dbExecute(conn, create_mtcars_query)
 
 # Read in the RDS file created in 'data_prep.R'
-dat <- readRDS("data_prep/prepped/mtcars.RDS")
+dat <- readRDS("traditional/data_prep/prepped/mtcars.RDS")
 
 # Create 'id' column in 'dat' dataframe
 uids <- lapply(1:nrow(dat), function(row_num) {
