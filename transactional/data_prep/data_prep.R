@@ -17,4 +17,4 @@ mtcars <- mtcars %>%
          am = ifelse(am == 0, 'Automatic', 'Manual'),
          is_deleted = FALSE)
 
-saveRDS(mtcars, file = 'data_prep/prepped/mtcars.RDS')
+saveRDS(mtcars, file = 'transactional/data_prep/prepped/mtcars.RDS')
