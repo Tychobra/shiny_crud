@@ -1,7 +1,7 @@
 
-#' title
+#' Car Delete Module
 #'
-#' detail goes here
+#' This module is for deleting a row's information from the mtcars database file
 #'
 #' @param 
 #'
@@ -14,7 +14,6 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
   observeEvent(modal_trigger(), {
     # Authorize who is able to access particular buttons (here, modules)
     req(session$userData$email == 'tycho.brahe@tychobra.com')
-    hold <- car_to_delete()
     
     showModal(
       modalDialog(
@@ -34,33 +33,24 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
     )
   })
   
-  car_delete_prep <- reactive({
-    hold <- car_to_delete()
-    
-    hold <- as.list(hold)
-    
-    hold$is_deleted <- TRUE
-    hold$uid <- NULL
-    hold$modified_at <- as.character(tychobratools::time_now_utc())
-    hold$created_at <- as.character(hold$created_at)
-    
-    hold
-  })
-  
   observeEvent(input$delete_button, {
+    req(modal_trigger())
+    
     removeModal()
-    out <- car_delete_prep()
     
     tryCatch({
-      
-      tychobratools::add_row(
+
+      uid <- as.character(modal_trigger())
+
+      DBI::dbExecute(
         session$userData$conn,
-        "mtcars",
-        out
+        "DELETE FROM mtcars WHERE uid=$1",
+        params = c(uid)
       )
       
       session$userData$db_trigger(session$userData$db_trigger() + 1)
-      tychobratools::show_toast("success", "Car Successfully Deleted")
+      shinytoastr::toastr_success("Car Successfully Deleted")
+      # tychobratools::show_toast("success", "Car Successfully Deleted")
     }, error = function(error) {
       
       tychobratools::show_toast("error", "Error Deleting Car")
