@@ -10,11 +10,13 @@ library(shinydashboard)
 library(lubridate)
 library(shinytoastr)
 
+# Create database connection
 conn <- dbConnect(
   RSQLite::SQLite(),
   dbname = 'data/mtcars.sqlite3'
 )
 
+# Stop database connection when application stops
 shiny::onStop(function() {
   dbDisconnect(conn)
 })
