@@ -174,7 +174,7 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
     dat <- validate_edit()
 
     tryCatch({
-      browser()
+      # browser()
       if (is.na(dat$uid)) {
         # creating a new car
         uid <- digest::digest(dat)
@@ -204,10 +204,10 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
       }
 
       session$userData$db_trigger(session$userData$db_trigger() + 1)
-      tychobratools::show_toast("success", paste0(modal_title, " Success"))
+      shinytoastr::toastr_success(paste0(modal_title, " Success"))
     }, error = function(error) {
 
-      tychobratools::show_toast("error", "Error Editing Car")
+      shinytoastr::toastr_error("Error Editing Car")
 
       print(error)
     })
