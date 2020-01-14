@@ -6,6 +6,7 @@
 #' @param 
 #'
 #' @return
+#' 
 #' @importFrom  shiny showModal observeEvent modalDialog actionButton modalButton observeEvent
 #'
 car_delete_module <- function(input, output, session, modal_title, car_to_delete, modal_trigger) {
@@ -50,14 +51,11 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
       
       session$userData$db_trigger(session$userData$db_trigger() + 1)
       shinytoastr::toastr_success("Car Successfully Deleted")
-      # tychobratools::show_toast("success", "Car Successfully Deleted")
     }, error = function(error) {
       
-      tychobratools::show_toast("error", "Error Deleting Car")
+      shinytoastr::toastr_error("Error Deleting Car")
       
       print(error)
     })
-    
   })
-  
 }
