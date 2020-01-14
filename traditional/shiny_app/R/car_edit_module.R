@@ -146,17 +146,22 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
       )
     )
 
-    time_now <- as.character(tychobratools::time_now_utc())
-    out$data$modified_by <- session$userData$email
-    out$data$modified_at <- time_now
+    time_now <- as.character(lubridate::with_tz(Sys.time(), tzone = "UTC"))
 
     if (is.null(hold)) {
       # adding a new car
-
-      out$created_at <- time_now
-      out$created_by <- session$userData$email
-
+      
+      out$data$created_at <- time_now
+      out$data$created_by <- session$userData$email
+    } else {
+      # Editing existing car
+      
+      out$data$created_at <- as.character(hold$created_at)
+      out$data$created_by <- hold$created_by
     }
+    
+    out$data$modified_at <- time_now
+    out$data$modified_by <- session$userData$email
 
     out
   })
@@ -174,16 +179,16 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
     dat <- validate_edit()
 
     tryCatch({
-      # browser()
+      
       if (is.na(dat$uid)) {
         # creating a new car
-        uid <- digest::digest(dat)
+        uid <- digest::digest(Sys.time())
 
         dbExecute(
           session$userData$conn,
           "INSERT INTO mtcars (uid, model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am,
-          gear, carb, modified_by, modified_at, created_by, created_at) VALUES
-          ($1, $2, $3, $4, $5, $6, $7, $8, $9. $10, $11, $12, $13, $14, $15, $16, $17)",
+          gear, carb, created_at, created_by, modified_at,  modified_by) VALUES
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
           params = c(
             list(uid),
             unname(dat$data)
@@ -194,8 +199,8 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
         dbExecute(
           session$userData$conn,
           "UPDATE mtcars SET model=$1, mpg=$2, cyl=$3, disp=$4, hp=$5, drat=$6,
-          wt=$7, qsec=$8, vs=$9, am=$10, gear=$11, carb=$12, modified_by=$13,
-          modified_at=$14 WHERE uid=$15",
+          wt=$7, qsec=$8, vs=$9, am=$10, gear=$11, carb=$12, created_at=$13, created_by=$14, 
+          modified_at=$15, modified_by=$16 WHERE uid=$17",
           params = c(
             unname(dat$data),
             list(dat$uid)
@@ -204,10 +209,10 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
       }
 
       session$userData$db_trigger(session$userData$db_trigger() + 1)
-      shinytoastr::toastr_success(paste0(modal_title, "Success"))
+      shinytoastr::toastr_success(paste0(modal_title, " Success"))
     }, error = function(error) {
-
-      shinytoastr::toastr_error("Error Editing Car")
+      
+      shinytoastr::toastr_error(paste0(modal_title, " Error"))
 
       print(error)
     })
