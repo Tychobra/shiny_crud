@@ -19,7 +19,7 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
     showModal(
       modalDialog(
         h3(
-          "Are you sure you want to delete this information?"
+          paste("Are you sure you want to delete the information for the", car_to_delete(), "car?")
         ),
         title = modal_title,
         size = "m",
