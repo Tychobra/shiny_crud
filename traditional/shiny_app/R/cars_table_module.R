@@ -165,9 +165,12 @@ cars_table_module <- function(input, output, session) {
   )
 
   car_to_delete <- eventReactive(input$car_id_to_delete, {
-
-    cars() %>%
-      filter(uid == input$car_id_to_delete)
+    
+    out <- cars() %>%
+      filter(uid == input$car_id_to_delete) %>%
+      pull(model)
+    
+    out <- as.character(out)
   })
 
   callModule(
