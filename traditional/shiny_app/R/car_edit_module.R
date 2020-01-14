@@ -26,12 +26,12 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
             textInput(
               ns("model"),
               'Model',
-              value = if (is.null(hold)) "" else hold$model
+              value = ifelse(is.null(hold), "", hold$model)
             ),
             numericInput(
               ns('mpg'),
               'Miles/Gallon',
-              value = if (is.null(hold)) "" else hold$mpg,
+              value = ifelse(is.null(hold), "", hold$mpg),
               min = 0,
               step = 0.1
             ),
@@ -39,26 +39,26 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
               ns('am'),
               'Transmission',
               choices = c('Automatic', 'Manual'),
-              selected = if (is.null(hold)) "" else hold$am
+              selected = ifelse(is.null(hold), "", hold$am)
             ),
             numericInput(
               ns('disp'),
               'Displacement (cu.in.)',
-              value = if (is.null(hold)) "" else hold$disp,
+              value = ifelse(is.null(hold), "", hold$disp),
               min = 0,
               step = 0.1
             ),
             numericInput(
               ns('hp'),
               'Horsepower',
-              value = if (is.null(hold)) "" else hold$hp,
+              value = ifelse(is.null(hold), "", hold$hp),
               min = 0,
               step = 1
             ),
             numericInput(
               ns('drat'),
               'Rear Axle Ratio',
-              value = if (is.null(hold)) "" else hold$drat,
+              value = ifelse(is.null(hold), "", hold$drat),
               min = 0,
               step = 0.01
             )
@@ -68,14 +68,14 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
             numericInput(
               ns('wt'),
               'Weight (lbs)',
-              value = if (is.null(hold)) "" else hold$wt,
+              value = ifelse(is.null(hold), "", hold$wt),
               min = 0,
               step = 1
             ),
             numericInput(
               ns('qsec'),
               '1/4 Mile Time',
-              value = if (is.null(hold)) "" else hold$qsec,
+              value = ifelse(is.null(hold), "", hold$qsec),
               min = 0,
               step = 0.01
             ),
@@ -83,12 +83,12 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
               ns('vs'),
               'Engine',
               choices = c('Straight', 'V-shaped'),
-              selected = if (is.null(hold)) "" else hold$vs
+              selected = ifelse(is.null(hold), "", hold$vs)
             ),
             numericInput(
               ns('cyl'),
               'Cylinders',
-              value = if (is.null(hold)) "" else hold$cyl,
+              value = ifelse(is.null(hold), "", hold$cyl),
               min = 0,
               max = 20,
               step = 1
@@ -96,14 +96,14 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
             numericInput(
               ns('gear'),
               'Forward Gears',
-              value = if (is.null(hold)) "" else hold$gear,
+              value = ifelse(is.null(hold), "", hold$gear),
               min = 0,
               step = 1
             ),
             numericInput(
               ns('carb'),
               'Carburetors',
-              value = if (is.null(hold)) "" else hold$carb,
+              value = ifelse(is.null(hold), "", hold$carb),
               min = 0,
               step = 1
             )
