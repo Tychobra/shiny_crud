@@ -47,7 +47,7 @@ cars_table_module_ui <- function(id) {
 
 cars_table_module <- function(input, output, session) {
 
-  # read in "mtcars" table from the database
+  # Read in "mtcars" table from the database
   cars <- reactive({
     session$userData$db_trigger()
 
@@ -79,11 +79,11 @@ cars_table_module <- function(input, output, session) {
       )
     })
 
-    # remove the uid column.  We don't want to show this column to the user
+    # Remove the `uid` column. We don't want to show this column to the user
     out <- out %>%
       select(-uid)
 
-    # set the row action buttons to the first column of the mtcars table
+    # Set the Action Buttons row to the first column of the `mtcars` table
     out <- cbind(
       tibble(" " = actions),
       out
