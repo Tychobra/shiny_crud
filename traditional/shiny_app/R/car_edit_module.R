@@ -116,9 +116,8 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
           actionButton(
             ns('submit'),
             'Submit',
-            class = "btn-success",
-            style="color: #fff;",
-            icon = icon("plus")
+            class = "btn btn-primary",
+            style = "color: white"
           )
         )
       )
