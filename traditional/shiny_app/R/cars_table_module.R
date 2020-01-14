@@ -59,7 +59,6 @@ cars_table_module <- function(input, output, session) {
         modified_at = as.POSIXct(modified_at, tz = "UTC")
       ) %>%
       arrange(desc(modified_at))
-
   })
 
 

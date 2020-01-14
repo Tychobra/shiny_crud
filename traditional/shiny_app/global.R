@@ -21,9 +21,6 @@ shiny::onStop(function() {
   dbDisconnect(conn)
 })
 
-
-
-
 # Turn off scientific notation
 options(scipen = 999)
 
