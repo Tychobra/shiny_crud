@@ -14,10 +14,10 @@
 #'
 car_edit_module <- function(input, output, session, modal_title, car_to_edit, modal_trigger) {
   ns <- session$ns
-
+  
   observeEvent(modal_trigger(), {
     hold <- car_to_edit()
-
+    
     showModal(
       modalDialog(
         fluidRow(
@@ -122,6 +122,22 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
         )
       )
     )
+  })
+  
+  # Observe event for "Model" text input in Add/Edit Car Modal
+  # `shinyFeedback`
+  observeEvent(input$model, {
+    
+    if (input$model == "") {
+      shinyFeedback::showFeedbackDanger(
+        "model",
+        text = "Must enter model of car!"
+      )
+      shinyjs::disable('submit')
+    } else {
+      shinyFeedback::hideFeedback("model")
+      shinyjs::enable('submit')
+    }
   })
 
   edit_car_dat <- reactive({
