@@ -1,17 +1,23 @@
 
-#' title
+#' Car Add & Edit Module
 #'
-#' detail goes here
+#' Module to add & edit cars in the mtcars database file
+#'
+#' @importFrom shiny observeEvent showModal modalDialog removeModal fluidRow column textInput numericInput selectInput modalButton actionButton reactive eventReactive
+#' @importFrom shinyFeedback showFeedbackDanger hideFeedback
+#' @importFrom shinyjs enable disable
+#' @importFrom lubridate with_tz
+#' @importFrom digest digest
+#' @importFrom DBI dbExecute
+#' @importFrom shinytoastr toastr_success toastr_error
 #'
 #' @param modal_title string - the title for the modal
 #' @param car_to_edit reactive returning a 1 row data frame of the car to edit
 #' from the "mt_cars" table
-#' @param model_trigger reactive trigger to open the modal
-#'
-#'
-#' @importFrom shiny showModal modalDialog fluidRow column textInput numericInput selectInput modalButton actionButton reactive
-#' @importClassesFrom digest digest
-#'
+#' @param modal_trigger reactive trigger to open the modal (Add or Edit buttons)
+#' 
+#' @return None
+
 car_edit_module <- function(input, output, session, modal_title, car_to_edit, modal_trigger) {
   ns <- session$ns
   

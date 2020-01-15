@@ -1,16 +1,15 @@
-#' cars_table_module.R
+#' Cars Table Module UI
 #'
-#' The module for displaying the mtcars datatable
+#' The UI portion of the module for displaying the mtcars datatable
 #'
-#' @param id The id for this module
-#'
-#'
-#' @importFrom shiny NS tagList fluidRow column actionButton br
+#' @importFrom shiny NS tagList fluidRow column actionButton tags 
 #' @importFrom DT DTOutput
-#' @importFrom htmltools tags
 #' @importFrom shinycssloaders withSpinner
 #'
-#'
+#' @param id The id for this module
+#' 
+#' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
+
 cars_table_module_ui <- function(id) {
   ns <- NS(id)
 
@@ -44,6 +43,20 @@ cars_table_module_ui <- function(id) {
     tags$script(paste0("cars_table_module_js('", ns(''), "')"))
   )
 }
+
+#' Cars Table Module Server
+#'
+#' The Server portion of the module for displaying the mtcars datatable
+#'
+#' @importFrom shiny reactive reactiveVal observeEvent req callModule eventReactive 
+#' @importFrom DT renderDT datatable replaceData dataTableProxy
+#' @importFrom dplyr tbl collect mutate arrange select filter pull
+#' @importFrom purrr map_chr
+#' @importFrom tibble tibble
+#'
+#' @param None
+#' 
+#' @return None
 
 cars_table_module <- function(input, output, session) {
 
