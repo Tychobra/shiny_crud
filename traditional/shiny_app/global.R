@@ -1,3 +1,4 @@
+# Library in packages used in this application
 library(shiny)
 library(DT)
 library(dplyr)
@@ -27,6 +28,3 @@ options(scipen = 999)
 
 # Set spinner type (for loading)
 options(spinner.type = 8)
-
-
-

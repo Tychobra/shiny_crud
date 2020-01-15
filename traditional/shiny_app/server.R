@@ -6,6 +6,7 @@ server <- function(input, output, session) {
   session$userData$conn <- conn
   session$userData$db_trigger <- reactiveVal(0)
 
+  # Call the server function portion of the `cars_table_module.R` module file
   callModule(
     cars_table_module,
     "cars_table"
