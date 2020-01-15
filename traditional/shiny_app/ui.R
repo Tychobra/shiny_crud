@@ -1,6 +1,7 @@
 ui <- fluidPage(
+  shinytoastr::useToastr(),
+  shinyFeedback::useShinyFeedback(),
   shinyjs::useShinyjs(),
-  useToastr(),
   # Application Title
   titlePanel(
     h1("Shiny CRUD Application", align = 'center'),

@@ -9,6 +9,7 @@ library(shinyWidgets)
 library(shinydashboard)
 library(lubridate)
 library(shinytoastr)
+library(shinyFeedback)
 
 # Create database connection
 conn <- dbConnect(
