@@ -122,6 +122,10 @@ cars_table_module <- function(input, output, session) {
     datatable(
       out,
       rownames = FALSE,
+      colnames = c('Model', 'Miles/Gallon', 'Cylinders', 'Displacement (cu.in.)',
+                   'Horsepower', 'Rear Axle Ratio', 'Weight (lbs)', '1/4 Mile Time',
+                   'Engine', 'Transmission', 'Forward Gears', 'Carburetors', 'Created At',
+                   'Created By', 'Modified At', 'Modified By'),
       selection = "none",
       class = "compact stripe row-border nowrap",
       # Escape the HTML in all except 1st column (which has the buttons)
