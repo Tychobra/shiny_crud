@@ -10,6 +10,7 @@ library(shinydashboard)
 library(tychobratools)
 library(lubridate)
 library(shinytoastr)
+library(shinyFeedback)
 
 
 conn <- dbConnect(
