@@ -1,0 +1,21 @@
+---
+title: "Traditional CRUD App with R Shiny & SQLite"
+author: "Patrick Howard"
+date: "1/15/2020"
+output: 
+  html_document: 
+    number_sections: yes
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**NOTE:** This post is intended for users comfortable with [R](https://www.r-project.org/) & [Shiny](https://shiny.rstudio.com), and at the very least familiar with DBMS's (here, [SQLite](https://www.sqlite.org)), [JavaScript](https://www.javascript.com), & [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS).
+
+# Introduction
+
+In this blog post, I'll discuss how utilize modularization to create a simple CRUD (Create, Read, Update, Delete) application using R's Shiny framework & a local SQLite3 database file. This same application can be made with other DBMS's with very few changes. Additionally, this app has a heavy focus on modularization.
+
+## Test Numbered Subtitle
