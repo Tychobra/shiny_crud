@@ -115,8 +115,6 @@ cars_table_module <- function(input, output, session) {
       replaceData(car_table_proxy, out, resetPaging = FALSE, rownames = FALSE)
       
     }
-    
-    browser()
   })
   
   output$car_table <- renderDT({
