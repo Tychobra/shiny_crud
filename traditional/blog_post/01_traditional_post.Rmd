@@ -18,4 +18,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 In this blog post, I'll discuss how utilize modularization to create a simple CRUD (Create, Read, Update, Delete) application using R's Shiny framework & a local SQLite3 database file. This same application can be made with other DBMS's with very few changes. Additionally, this app has a heavy focus on modularization.
 
-## Test Numbered Subtitle
+## High Level Table UI
+
+At a high level, the CRUD application's car_table module along with two nested modules(i.e. car_delete and car_edit) provide the backbone for the application.  Theses modules interact with a local SQLite3 database.
+
+Within the car_table module, the primary UI displays an action button to "add car" and a DT Ouptut to display the table of car data. Within the car table, a seperate function is called(i.e. cars_table_module_js) which is used to add the javascript necessary to construct an edit and delete button which is present in the leftmost column.
+
+## Car Edit Module
+
+The "Add" button at the top of the page and the "Edit" button contained within the first column both call upon the car_edit_module for their functionality.  This module displays a 'modal" or pop up box with numeric and text input fields.  This modal is what accepts user input to "Edit" or "Add" to the car table.  When the "Submit" button at the lower right corner of the "modal" is pressed, the application creates a list with the modal selections and a unique 'uid" to identify the row.  After validation, the app generates the requisite SQL commands to insert or edit row into the database.  
+
+## Car Delete Module
+
+The delete module is called upon when the "Delete" button(red trashcan) is clicked.  This module is simpler in its functionality and simply displays a "modal" that asks if the user is sure they want to delete this row as well as two button options("Delete Car" and "Cancel").  When the "Delete Car" button is selected the SQL command is generated which deletes the desired row.  
+
+
