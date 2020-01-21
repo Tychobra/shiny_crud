@@ -1,24 +1,17 @@
 library(RSQLite)
-#library(DBI)
-#library(config)
+library(DBI)
 library(tibble)
 
-# Set the configuration environment to work with either the development (default)
-# database, or the production database (for actual deployment)
-# NOTE: NO config.yml file at the moment (connected to SQLite & using .sqlite file)
-# Sys.setenv("R_CONFIG_ACTIVE" = "default")
-# #Sys.setenv("R_CONFIG_ACTIVE" = "production")
-#
-# db_config <- config::get(file = 'shiny_app/config.yml')
-
 # Create a connection object with SQLite
-conn <- dbConnect(RSQLite::SQLite(), 'transactional/shiny_app/data/mtcars.sqlite3')
+conn <- dbConnect(
+  RSQLite::SQLite(),
+  'transactional/shiny_app/data/mtcars.sqlite3'
+)
 
 # Create a query to prepare the 'mtcars' table with additional 'uid', 'id',
 # & the 4 created/modified columns
 create_mtcars_query = "CREATE TABLE mtcars (
   uid                             SERIAL PRIMARY KEY,
-  id                              TEXT,
   model                           TEXT,
   mpg                             REAL,
   cyl                             REAL,
@@ -48,11 +41,16 @@ dbExecute(conn, create_mtcars_query)
 dat <- readRDS("transactional/data_prep/prepped/mtcars.RDS")
 
 # Create 'id' column in 'dat' dataframe
-ids <- lapply(1:nrow(dat), function(row_num) {
+uids <- lapply(1:nrow(dat), function(row_num) {
   row_data <- digest::digest(dat[row_num, ])
 })
 
-dat$id <- unlist(ids)
+# add uid column to the `dat` data frame
+dat$uid <- unlist(uids)
+
+# reorder the columns so `uid` is 1st
+dat <- dat %>%
+  select(uid, everything())
 
 # Fill in the SQLite table with the values from the RDS file
 DBI::dbWriteTable(
