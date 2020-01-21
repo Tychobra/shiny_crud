@@ -208,7 +208,7 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
         dbExecute(
           session$userData$conn,
           "INSERT INTO mtcars (uid, model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am,
-          gear, carb, created_at, created_by, modified_at,  modified_by) VALUES
+          gear, carb, created_at, created_by, modified_at, modified_by) VALUES
           ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
           params = c(
             list(uid),

@@ -1,19 +1,29 @@
 
-#' title
+#' Car Add & Edit Module
 #'
-#' detail goes here
+#' Module to add & edit cars in the mtcars database file
 #'
-#' @param
+#' @importFrom shiny observeEvent showModal modalDialog removeModal fluidRow column textInput numericInput selectInput modalButton actionButton reactive eventReactive
+#' @importFrom shinyFeedback showFeedbackDanger hideFeedback
+#' @importFrom shinyjs enable disable
+#' @importFrom lubridate with_tz
+#' @importFrom digest digest
+#' @importFrom DBI dbExecute
+#' @importFrom shinytoastr toastr_success toastr_error
 #'
-#' @return
-#'
+#' @param modal_title string - the title for the modal
+#' @param car_to_edit reactive returning a 1 row data frame of the car to edit
+#' from the "mt_cars" table
+#' @param modal_trigger reactive trigger to open the modal (Add or Edit buttons)
+#' 
+#' @return None
+
 car_edit_module <- function(input, output, session, modal_title, car_to_edit, modal_trigger) {
   ns <- session$ns
-
+  
   observeEvent(modal_trigger(), {
-    req(session$userData$email == 'tycho.brahe@tychobra.com')
     hold <- car_to_edit()
-
+    
     showModal(
       modalDialog(
         fluidRow(
@@ -22,41 +32,39 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
             textInput(
               ns("model"),
               'Model',
-              value = if (is.null(hold)) "" else hold$model
+              value = ifelse(is.null(hold), "", hold$model)
             ),
             numericInput(
               ns('mpg'),
               'Miles/Gallon',
-              value = if (is.null(hold)) "" else hold$mpg,
+              value = ifelse(is.null(hold), "", hold$mpg),
               min = 0,
               step = 0.1
             ),
-            numericInput(
-              ns('cyl'),
-              'Cylinders',
-              value = if (is.null(hold)) "" else hold$cyl,
-              min = 0,
-              max = 20,
-              step = 1
+            selectInput(
+              ns('am'),
+              'Transmission',
+              choices = c('Automatic', 'Manual'),
+              selected = ifelse(is.null(hold), "", hold$am)
             ),
             numericInput(
               ns('disp'),
               'Displacement (cu.in.)',
-              value = if (is.null(hold)) "" else hold$disp,
+              value = ifelse(is.null(hold), "", hold$disp),
               min = 0,
               step = 0.1
             ),
             numericInput(
               ns('hp'),
               'Horsepower',
-              value = if (is.null(hold)) "" else hold$hp,
+              value = ifelse(is.null(hold), "", hold$hp),
               min = 0,
               step = 1
             ),
             numericInput(
               ns('drat'),
               'Rear Axle Ratio',
-              value = if (is.null(hold)) "" else hold$drat,
+              value = ifelse(is.null(hold), "", hold$drat),
               min = 0,
               step = 0.01
             )
@@ -66,14 +74,14 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
             numericInput(
               ns('wt'),
               'Weight (lbs)',
-              value = if (is.null(hold)) "" else hold$wt,
+              value = ifelse(is.null(hold), "", hold$wt),
               min = 0,
               step = 1
             ),
             numericInput(
               ns('qsec'),
               '1/4 Mile Time',
-              value = if (is.null(hold)) "" else hold$qsec,
+              value = ifelse(is.null(hold), "", hold$qsec),
               min = 0,
               step = 0.01
             ),
@@ -81,25 +89,27 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
               ns('vs'),
               'Engine',
               choices = c('Straight', 'V-shaped'),
-              selected = if (is.null(hold)) "" else hold$vs
+              selected = ifelse(is.null(hold), "", hold$vs)
             ),
-            selectInput(
-              ns('am'),
-              'Transmission',
-              choices = c('Automatic', 'Manual'),
-              selected = if (is.null(hold)) "" else hold$am
+            numericInput(
+              ns('cyl'),
+              'Cylinders',
+              value = ifelse(is.null(hold), "", hold$cyl),
+              min = 0,
+              max = 20,
+              step = 1
             ),
             numericInput(
               ns('gear'),
               'Forward Gears',
-              value = if (is.null(hold)) "" else hold$gear,
+              value = ifelse(is.null(hold), "", hold$gear),
               min = 0,
               step = 1
             ),
             numericInput(
               ns('carb'),
               'Carburetors',
-              value = if (is.null(hold)) "" else hold$carb,
+              value = ifelse(is.null(hold), "", hold$carb),
               min = 0,
               step = 1
             )
@@ -112,83 +122,123 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
           actionButton(
             ns('submit'),
             'Submit',
-            class = "btn-success",
-            style="color: #fff;",
-            icon = icon("plus")
+            class = "btn btn-primary",
+            style = "color: white"
           )
         )
       )
     )
   })
-
+  
+  # Observe event for "Model" text input in Add/Edit Car Modal
+  # `shinyFeedback`
+  observeEvent(input$model, {
+    
+    if (input$model == "") {
+      shinyFeedback::showFeedbackDanger(
+        "model",
+        text = "Must enter model of car!"
+      )
+      shinyjs::disable('submit')
+    } else {
+      shinyFeedback::hideFeedback("model")
+      shinyjs::enable('submit')
+    }
+  })
+  
   edit_car_dat <- reactive({
     hold <- car_to_edit()
-
-    new_vals <- list(
-      'model' = input$model,
-      'mpg' = input$mpg,
-      'cyl' = input$cyl,
-      'disp' = input$disp,
-      'hp' = input$hp,
-      'drat' = input$drat,
-      'wt' = input$wt,
-      'qsec' = input$qsec,
-      'vs' = input$vs,
-      'am' = input$am,
-      'gear' = input$gear,
-      'carb' = input$carb
+    
+    out <- list(
+      uid = if (is.null(hold)) NA else hold$uid,
+      data = list(
+        "model" = input$model,
+        "mpg" = input$mpg,
+        "cyl" = input$cyl,
+        "disp" = input$disp,
+        "hp" = input$hp,
+        "drat" = input$drat,
+        "wt" = input$wt,
+        "qsec" = input$qsec,
+        "vs" = input$vs,
+        "am" = input$am,
+        "gear" = input$gear,
+        "carb" = input$carb
+      )
     )
-
-    new_vals$modified_by <- session$userData$email
-    new_vals$modified_at <- as.character(tychobratools::time_now_utc())
-
-
+    
+    time_now <- as.character(lubridate::with_tz(Sys.time(), tzone = "UTC"))
+    
     if (is.null(hold)) {
       # adding a new car
-      out <- new_vals
-      out$created_at <- as.character(tychobratools::time_now_utc())
-      out$created_by <- session$userData$email
-      out$id <- digest::digest(new_vals)
+      
+      out$data$created_at <- time_now
+      out$data$created_by <- session$userData$email
     } else {
-
-      new_vals$created_by <- hold$created_by
-      new_vals$created_at <- as.character(hold$created_at)
-
-      # editing an existing car
-      out <- modifyList(hold, new_vals)
+      # Editing existing car
+      
+      out$data$created_at <- as.character(hold$created_at)
+      out$data$created_by <- hold$created_by
     }
-
+    
+    out$data$modified_at <- time_now
+    out$data$modified_by <- session$userData$email
+    
+    out$data$is_deleted <- FALSE
+    
     out
   })
-
+  
   validate_edit <- eventReactive(input$submit, {
     dat <- edit_car_dat()
-
+    
     # Logic to validate inputs...
-
+    
     dat
   })
-
+  
   observeEvent(validate_edit(), {
     removeModal()
     dat <- validate_edit()
-
+    
     tryCatch({
-
-      tychobratools::add_row(
-        session$userData$conn,
-        "mtcars",
-        dat
-      )
-
+      
+      if (is.na(dat$uid)) {
+        # creating a new car
+        uid <- digest::digest(Sys.time())
+        
+        dbExecute(
+          session$userData$conn,
+          "INSERT INTO mtcars (uid, model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am,
+          gear, carb, created_at, created_by, modified_at, modified_by, is_deleted) VALUES
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+          params = c(
+            list(uid),
+            unname(dat$data)
+          )
+        )
+      } else {
+        # editing an existing car
+        dbExecute(
+          session$userData$conn,
+          "UPDATE mtcars SET model=$1, mpg=$2, cyl=$3, disp=$4, hp=$5, drat=$6,
+          wt=$7, qsec=$8, vs=$9, am=$10, gear=$11, carb=$12, created_at=$13, created_by=$14, 
+          modified_at=$15, modified_by=$16, is_deleted=$17 WHERE uid=$18",
+          params = c(
+            unname(dat$data),
+            list(dat$uid)
+          )
+        )
+      }
+      
       session$userData$db_trigger(session$userData$db_trigger() + 1)
-      tychobratools::show_toast("success", paste0(modal_title, " Success"))
+      shinytoastr::toastr_success(paste0(modal_title, " Success"))
     }, error = function(error) {
-
-      tychobratools::show_toast("error", "Error Editing Car")
-
+      
+      shinytoastr::toastr_error(paste0(modal_title, " Error"))
+      
       print(error)
     })
   })
-
+  
 }
