@@ -38,7 +38,7 @@ dbExecute(conn, create_mtcars_query)
 # Read in the RDS file created in 'data_prep.R'
 dat <- readRDS("traditional/data_prep/prepped/mtcars.RDS")
 
-# Create 'id' column in 'dat' dataframe
+# Create 'uid' column in 'dat' dataframe
 uids <- lapply(1:nrow(dat), function(row_num) {
   row_data <- digest::digest(dat[row_num, ])
 })
