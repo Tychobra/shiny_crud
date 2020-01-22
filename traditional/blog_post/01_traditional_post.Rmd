@@ -12,15 +12,46 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-**NOTE:** This post is intended for users comfortable with [R](https://www.r-project.org/) & [Shiny](https://shiny.rstudio.com), and at the very least familiar with DBMS's (here, [SQLite](https://www.sqlite.org)), [JavaScript](https://www.javascript.com), & [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS).
-
 # Introduction
 
-In this blog post, I'll discuss how utilize modularization to create a simple CRUD (Create, Read, Update, Delete) application using R's Shiny framework & a local SQLite3 database file. This same application can be made with other DBMS's with very few changes. Additionally, this app has a heavy focus on modularization.
+**NOTE:** This post is intended for users comfortable with [R](https://www.r-project.org/) & [Shiny](https://shiny.rstudio.com), and at the very least familiar with DBMS's (here, [SQLite](https://www.sqlite.org)), [JavaScript](https://www.javascript.com), & [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS).
+
+## Overview
+
+In this blog post, I'll discuss how to create a simple CRUD (Create, Read, Update, Delete) application using R's Shiny framework & a local SQLite3 database file. This same application can be made with other DBMS's with very few changes. Additionally, this app has a heavy focus on utilizing application [modularization](https://shiny.rstudio.com/articles/modules.html).
+
+## Data
+
+For this application, we use the well-known [mtcars](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html) dataset, applying some data preparation (saved as `data_prep.R` in the `data_prep` directory) to the data before saving the transformed data as an RDS file in the `data_prep/prepped/` directory. For example, the mtcars dataset uses the `model` of the car as the rownames of the dataframe, so we convert these to a column named `model` by using the `rownames_to_column()` function.
+
+Then, in `db_init.R` (also in the `data_prep` directory), we use the [`RSQLite`](https://rsqlite.r-dbi.org/) package to create a connection object with the local `SQLite` database, or file, creating a new `.sqlite3` file if one doesn't already exist. Initially, we write an empty table specifying the column names & value types. We loop through the transformed data, creating our own unique `uid` values by applying a hash function with the `digest()` function to each row of the data. These values are added to the transformed dataset as the `Primary Key` in the 1st column, named `uid`. Finally, we write the data to the `.sqlite3` file, named `mtcars.sqlite3` in the `shiny_app/data/` directory.
+
+## Application Structure
+
+As you may know, Shiny applications are able to handle a few different structures. Our applications always include 3 files placed in the `shiny_app` directory:
+
+* `global.R`
+  + `library()` in all necessary packages
+  + Create a database connection with `mtcars.sqlite3` file
+  + Apply any other global options here
+* `ui.R`
+  + Main UI portion of application
+  + Apply UI from modules (discussed more in the **Modules** section)
+* `server.R`
+  + Main server portion of application
+  + Use `callModule()` to call server portion of modules
+
+A Shiny app with this structure can be run by opening any 3 of these files, and pressing the `Run App` button in RStudio. 
+
+# Modules
+
+## Cars Table Module
+
+Of the 3 modules used in our app, this is the only module file (`cars_table_module.R`) that follows the typical module structure. That is, it contains a **UI** portion & a **server** portion. 
 
 ## High Level Table UI
 
-At a high level, the CRUD application's car_table module along with two nested modules(i.e. car_delete and car_edit) provide the backbone for the application.  Theses modules interact with a local SQLite3 database.
+At a high level, the CRUD application's car_table module along with two nested modules(i.e. car_delete and car_edit) provide the backbone for the application. These modules interact with a local SQLite3 database.
 
 Within the car_table module, the primary UI displays an action button to "add car" and a DT Ouptut to display the table of car data. Within the car table, a seperate function is called(i.e. cars_table_module_js) which is used to add the javascript necessary to construct an edit and delete button which is present in the leftmost column.
 
