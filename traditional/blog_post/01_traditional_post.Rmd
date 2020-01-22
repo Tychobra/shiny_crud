@@ -1,6 +1,6 @@
 ---
 title: "Traditional CRUD App with R Shiny & SQLite"
-author: "Patrick Howard"
+author: "Patrick Howard and Nick Merlino"
 date: "1/15/2020"
 output: 
   html_document: 
@@ -49,7 +49,7 @@ A Shiny app with this structure can be run by opening any 3 of these files, and 
 
 Of the 3 modules used in our app, this is the only module file (`cars_table_module.R`) that follows the typical module structure. That is, it contains a **UI** portion & a **server** portion. 
 
-## High Level Table UI
+## High Level(Car Table Module)
 
 At a high level, the CRUD application's car_table module along with two nested modules(i.e. car_delete and car_edit) provide the backbone for the application. These modules interact with a local SQLite3 database.
 
@@ -62,5 +62,6 @@ The "Add" button at the top of the page and the "Edit" button contained within t
 ## Car Delete Module
 
 The delete module is called upon when the "Delete" button(red trashcan) is clicked.  This module is simpler in its functionality and simply displays a "modal" that asks if the user is sure they want to delete this row as well as two button options("Delete Car" and "Cancel").  When the "Delete Car" button is selected the SQL command is generated which deletes the desired row.  
+
 
 
