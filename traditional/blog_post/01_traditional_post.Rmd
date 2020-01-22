@@ -45,15 +45,23 @@ A Shiny app with this structure can be run by opening any 3 of these files, and 
 
 # Modules
 
+## Overview
+
+One of the features included in the most recent update for `Shiny`, which we utilize for our modules, is the `R` directory. Any *R scripts* in the `shiny_app/R` directory are automatically sourced in by the app. Therefore, we place all of our module files in this directory so that they're automatically sourced into the app, whereas before we had to explicity source in each module file using the `source()` function.
+
 ## Cars Table Module
 
-Of the 3 modules used in our app, this is the only module file (`cars_table_module.R`) that follows the typical module structure. That is, it contains a **UI** portion & a **server** portion. 
+Of the 3 modules used in our app, this is the only module file (`cars_table_module.R`) that follows the typical module structure. That is, it contains a **UI** portion & a **server** portion. At the beginning of these code portions, we include [roxygen2](https://roxygen2.r-lib.org/articles/roxygen2.html) formatted documentation that explains the purpose of the module, the packages (& respective functions) included, the additional argument parameters (i.e. Anything besides **id** for the ui portion, or anything besides **input**, **output**, & **session** for the server portion), and what the module returns (if anything).
 
-## High Level(Car Table Module)
+### High-Level Description
 
 At a high level, the CRUD application's car_table module along with two nested modules(i.e. car_delete and car_edit) provide the backbone for the application. These modules interact with a local SQLite3 database.
 
-Within the car_table module, the primary UI displays an action button to "add car" and a DT Ouptut to display the table of car data. Within the car table, a seperate function is called(i.e. cars_table_module_js) which is used to add the javascript necessary to construct an edit and delete button which is present in the leftmost column.
+Within the `cars_table_module`, the primary UI displays an action button to "add car" and a DT Ouptut to display the table of car data. Within the car table, a seperate function is called(i.e. cars_table_module_js) which is used to add the javascript necessary to construct an edit and delete button which is present in the leftmost column.
+
+### UI Portion
+
+The **UI** portion (e.g. function) of this module is given the same name as the module's filename, but with `_ui` appended to the end. This particular UI portion has only 1 parameter, `id`, the default required parameter. You'll see that the 1st line of this portion includes `ns <- NS(id)`. This is required for any inputs/outputs used within the modules. This allows for the same modules to be reused for different purposes by applying a different `id` when calling the `module_ui(id)` function 
 
 ## Car Edit Module
 
