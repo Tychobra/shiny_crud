@@ -24,7 +24,7 @@ In this blog post, I'll discuss how to create a simple CRUD (Create, Read, Updat
 
 For this application, we use the well-known [mtcars](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html) dataset, applying some data preparation (saved as `data_prep.R` in the `data_prep` directory) to the data before saving the transformed data as an RDS file in the `data_prep/prepped/` directory. For example, the mtcars dataset uses the `model` of the car as the rownames of the dataframe, so we convert these to a column named `model` by using the `rownames_to_column()` function.
 
-Then, in `db_init.R` (also in the `data_prep` directory), we use the [`RSQLite`](https://rsqlite.r-dbi.org/) package to create a connection object with the local `SQLite` database, or file, creating a new `.sqlite3` file if one doesn't already exist. Initially, we write an empty table specifying the column names & value types. We loop through the transformed data, creating our own unique `uid` values by applying a hash function with the `digest()` function to each row of the data. These values are added to the transformed dataset as the `Primary Key` in the 1st column, named `uid`. Finally, we write the data to the `.sqlite3` file, named `mtcars.sqlite3` in the `shiny_app/data/` directory.
+Then, in `db_init.R` (also in the `data_prep` directory), we use the [`RSQLite`](https://rsqlite.r-dbi.org/) package to create a connection object with the local `SQLite` database, or file, creating a new `.sqlite3` file if one doesn't already exist. Initially, we write an empty table specifying the column names & value types. We loop through the transformed data, creating our own unique `uid` values by applying a hash function with the `digest()` function to each row of the data. These values are added to the transformed dataset as the `Primary Key` in the 1st column, named `uid`. Additionally, we add 4 more columns to the database table to keep records of any data addition or modification completed within the app: `created_at`, `created_by`, `modified_at`, & `modified_by`. Finally, we write the data to the `.sqlite3` file, named `mtcars.sqlite3` in the `shiny_app/data/` directory.
 
 ## Application Structure
 
@@ -39,37 +39,77 @@ As you may know, Shiny applications are able to handle a few different structure
   + Apply UI from modules (discussed more in the **Modules** section)
 * `server.R`
   + Main server portion of application
-  + Use `callModule()` to call server portion of modules
+  + Assign connection object (`conn`) to `session$userData$conn` so that it can be called throughout the app without have to include it as a parameter for the modules.
+  + Similarly, creates a `reactiveVal()` with an intial value of 0 assigned to a database trigger, `session$userData$db_trigger`, which is used within the modules to tell the app when the database has been changed (e.g. triggered) so that the app can update the displayed data accordingly. 
+  + Use `callModule()` to call server portion of modules (Here, only `cars_table_module.R`)
 
 A Shiny app with this structure can be run by opening any 3 of these files, and pressing the `Run App` button in RStudio. 
 
 # Modules
 
+One of the features included in the most recent update for `Shiny`, which we utilize for our modules, is the `R` directory. Any *R scripts* in the `shiny_app/R/` directory are automatically sourced in by the app. Therefore, we place all of our module files in this directory so that they're automatically sourced into the app, whereas before we had to explicity source in each module file using the `source()` function.
+
 ## Overview
 
-One of the features included in the most recent update for `Shiny`, which we utilize for our modules, is the `R` directory. Any *R scripts* in the `shiny_app/R` directory are automatically sourced in by the app. Therefore, we place all of our module files in this directory so that they're automatically sourced into the app, whereas before we had to explicity source in each module file using the `source()` function.
+This app includes 3 modules: **Cars Table Module**, **Cars Edit (or Add) Module**, & **Cars Delete Module**. Of these 3 modules, the last two are nested within the 1st module, respectively. Of these 2 nested modules, the **Cars Edit Module** is reused by applying different parameters in order to use it as a **Cars Add Module** instead.
 
 ## Cars Table Module
 
-Of the 3 modules used in our app, this is the only module file (`cars_table_module.R`) that follows the typical module structure. That is, it contains a **UI** portion & a **server** portion. At the beginning of these code portions, we include [roxygen2](https://roxygen2.r-lib.org/articles/roxygen2.html) formatted documentation that explains the purpose of the module, the packages (& respective functions) included, the additional argument parameters (i.e. Anything besides **id** for the ui portion, or anything besides **input**, **output**, & **session** for the server portion), and what the module returns (if anything).
-
-### High-Level Description
-
-At a high level, the CRUD application's car_table module along with two nested modules(i.e. car_delete and car_edit) provide the backbone for the application. These modules interact with a local SQLite3 database.
-
-Within the `cars_table_module`, the primary UI displays an action button to "add car" and a DT Ouptut to display the table of car data. Within the car table, a seperate function is called(i.e. cars_table_module_js) which is used to add the javascript necessary to construct an edit and delete button which is present in the leftmost column.
+This is the only module (`cars_table_module.R`) in our app that follows the default module structure. That is, it contains a **UI** portion & a **server** portion. At the beginning of these code portions, we include [roxygen2](https://roxygen2.r-lib.org/articles/roxygen2.html) formatted documentation that explains the purpose of the module, the packages (& respective functions) included, the additional argument parameters (i.e. Anything besides **id** for the ui portion, or anything besides **input**, **output**, & **session** for the server portion), and what the module returns (if anything).
 
 ### UI Portion
 
-The **UI** portion (e.g. function) of this module is given the same name as the module's filename, but with `_ui` appended to the end. This particular UI portion has only 1 parameter, `id`, the default required parameter. You'll see that the 1st line of this portion includes `ns <- NS(id)`. This is required for any inputs/outputs used within the modules. This allows for the same modules to be reused for different purposes by applying a different `id` when calling the `module_ui(id)` function 
+The **UI** portion (e.g. function) of this module is used for displaying the `mtcars` dataframe, which includes custom-made **UI** elements consisting of an edit & delete button in each row of the 1st column, in the **Cars Table** (using the `DT` package). This module also includes an `Add Car` button outside of the table. The **UI** portion of this module also sources in a custom `cars_table_module.js` JavaScript file, residing in the `www` directory, & its respective function. This function makes the **Edit** & **Delete** buttons functional, making these buttons Shiny inputs that correspond to their respective row. 
 
-## Car Edit Module
+This **UI** function is given the same name as the module's filename, but with `_ui` appended to the end. This particular UI portion has only 1 parameter, `id`, the default required parameter. You'll see that the 1st line of this portion includes `ns <- NS(id)`. This name space function is required for any inputs/outputs used within the modules, creating namespaced id's from the id provided as the argument in the `*_module_ui()` function. This allows for the same modules to be reused for different purposes by applying a different `id` when calling the `module_ui(id)` function 
 
-The "Add" button at the top of the page and the "Edit" button contained within the first column both call upon the car_edit_module for their functionality.  This module displays a 'modal" or pop up box with numeric and text input fields.  This modal is what accepts user input to "Edit" or "Add" to the car table.  When the "Submit" button at the lower right corner of the "modal" is pressed, the application creates a list with the modal selections and a unique 'uid" to identify the row.  After validation, the app generates the requisite SQL commands to insert or edit row into the database.  
+### Server Portion
 
-## Car Delete Module
+The **Server** portion (e.g. function) of this module reads in the `mtcars.sqlite3` file from the connection (`conn`) object as a dataframe. Because SQLite doesn't have a storage class for datetimes, the `created_at` & `modified_at` columns are technically saved as `TEXT` objects in the database, so they are converted to **POSIXct** (using `as.POSIXct()`) after being read in from the connection object. Additionally, the data is arranged so that the `modified_at` column is in descending order (i.e. The most recently modified data appears at the top of the data table). 
 
-The delete module is called upon when the "Delete" button(red trashcan) is clicked.  This module is simpler in its functionality and simply displays a "modal" that asks if the user is sure they want to delete this row as well as two button options("Delete Car" and "Cancel").  When the "Delete Car" button is selected the SQL command is generated which deletes the desired row.  
+The **Edit** & **Delete** HTML buttons (mentioned previously in **UI Portion** section) are joined with this dataframe, and the `uid` is dropped before passing it to a `reactiveVal()` which is used to populate the table with `renderDT()`. We use `DT`'s `dataTableProxy()` & `replaceData()` functions on this table, which allows the existing datatable to be manipulated without having to regenerate the entire table. 
 
+Lastly, the `callModule()` function is used to call the **Car Add/Edit** & **Car Delete** modules, creating the nested modules as previously mentioned.
 
+## Car Add/Edit & Delete Modules
+
+These modules require 3 additional parameters: 
+
+**Add/Edit:**
+
+* `modal_title`
+  + Text for the title of the modal
+* `car_to_edit`
+  + **Add:** This argument is passed as an empty function that returns `NULL` since the `uid` of the car being added doesn't exist yet.
+  + **Edit:** A **reactive** dataframe filtered with `uid` to gather the respective row where the `Edit Car` button was clicked.
+* `modal_trigger`
+  + The input (i.e button) that should trigger respective module's modal to appear:
+    + **Add:** The input for the `actionButton` created in the `cars_table_module_ui`
+    + **Edit:** The input for the `car_id_to_edit` created with the `cars_table_module.js`
+  + **NOTE:** These inputs **must** be passed as parameters wrapped within a `reactive({})`
+
+**Delete:**
+
+* `modal_title`
+  + Text for the title of the modal
+* `car_to_delete`
+  + A **reactive** dataframe filtered with `uid` to gather the respective row where the `Delete Car` button was clicked.
+* `modal_trigger`
+  + The input (i.e button) that should trigger respective module's modal to appear:
+    + The input for the `car_id_to_delete` created with the `cars_table_module.js`
+  + **NOTE:** These inputs **must** be passed as parameters wrapped within a `reactive({})`
+
+### Modal
+
+The `Add Car` button at the top of the page and the `Edit` button contained within the first column both call upon the `car_edit_module` for their functionality. This module displays a **modal**, or pop up box, with numeric and text input fields. 
+
+The `value` argument for the modal inputs checks the `car_to_edit` parameter using an `ifelse` statement. When adding a car, this parameter is **NULL**, so each inputs' value is empty when `showModal` is called. Additionally, we used the `shinyFeedback` & `shinyjs` packages for validation of the `model` input. A warning is shown under the input & the `Submit` button is disabled until any text is entered in the input. We've included an `eventReactive` that triggers when the `Submit` button of the modal is clicked, where further validation logic of the inputs can be included. 
+
+### Database Update
+
+After the modal `Submit` button is pressed & the modal is removed, the database upload functions are wrapped in a `tryCatch` statement. This way, if an error occurs anywhere within this statement, the database upload functions will not follow through with the submission. We use the `shinytoastr` package to send either *success* or *error* toast messages.
+
+We use the `DBI` package's `dbExecute()` function to run our database queries. SQLite supports parameterized queries, which helps to guard against SQL injection, as the parameters are passed in as arguments to the SQL query string.
+
+On each successful update, we add a value of 1 to the `db_trigger()` (`reactiveVal()` with initial value of zero), which will retrigger the original reactive where the data is read in from the database connection object.
 
