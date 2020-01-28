@@ -12,10 +12,12 @@ library(lubridate)
 library(shinytoastr)
 library(shinyFeedback)
 
+db_config <- config::get()$db
+
 # Create database connection
 conn <- dbConnect(
   RSQLite::SQLite(),
-  dbname = 'data/mtcars.sqlite3'
+  dbname = db_config$db_name
 )
 
 # Stop database connection when application stops
