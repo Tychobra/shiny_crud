@@ -1,4 +1,4 @@
 default:
   app_name: "crud_traditional"
   db:
-    'data/mtcars.sqlite3'
+    dbname: 'data/mtcars.sqlite3'

@@ -2,12 +2,12 @@
 #'
 #' The UI portion of the module for displaying the mtcars datatable
 #'
-#' @importFrom shiny NS tagList fluidRow column actionButton tags 
+#' @importFrom shiny NS tagList fluidRow column actionButton tags
 #' @importFrom DT DTOutput
 #' @importFrom shinycssloaders withSpinner
 #'
 #' @param id The id for this module
-#' 
+#'
 #' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
 
 cars_table_module_ui <- function(id) {
@@ -48,23 +48,26 @@ cars_table_module_ui <- function(id) {
 #'
 #' The Server portion of the module for displaying the mtcars datatable
 #'
-#' @importFrom shiny reactive reactiveVal observeEvent req callModule eventReactive 
+#' @importFrom shiny reactive reactiveVal observeEvent req callModule eventReactive
 #' @importFrom DT renderDT datatable replaceData dataTableProxy
 #' @importFrom dplyr tbl collect mutate arrange select filter pull
 #' @importFrom purrr map_chr
 #' @importFrom tibble tibble
 #'
 #' @param None
-#' 
+#'
 #' @return None
 
 cars_table_module <- function(input, output, session) {
 
+  # trigegr to reload data from the "mtcars" table
+  session$userData$mtcars_trigger <- reactiveVal(0)
+
   # Read in "mtcars" table from the database
   cars <- reactive({
-    session$userData$db_trigger()
+    session$userData$mtcars_trigger()
 
-    session$userData$conn %>%
+    conn %>%
       tbl('mtcars') %>%
       collect() %>%
       mutate(
@@ -181,11 +184,11 @@ cars_table_module <- function(input, output, session) {
   )
 
   car_to_delete <- eventReactive(input$car_id_to_delete, {
-    
+
     out <- cars() %>%
       filter(uid == input$car_id_to_delete) %>%
       pull(model)
-    
+
     out <- as.character(out)
   })
 

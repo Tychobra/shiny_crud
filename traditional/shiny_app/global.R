@@ -1,7 +1,6 @@
 # Library in packages used in this application
 library(shiny)
 library(DT)
-library(dplyr)
 library(DBI)
 library(RSQLite)
 library(shinyjs)
@@ -10,14 +9,16 @@ library(shinyWidgets)
 library(shinydashboard)
 library(lubridate)
 library(shinytoastr)
-library(shinyFeedback)
+library(shinyFeedback) # remotes::install_github("merlinoa/shinyFeedback")
+library(dplyr)
+library(dbplyr)
 
 db_config <- config::get()$db
 
 # Create database connection
 conn <- dbConnect(
   RSQLite::SQLite(),
-  dbname = db_config$db_name
+  dbname = db_config$dbname
 )
 
 # Stop database connection when application stops

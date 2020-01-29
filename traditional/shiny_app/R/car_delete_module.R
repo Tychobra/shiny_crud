@@ -19,7 +19,7 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
   observeEvent(modal_trigger(), {
     # Authorize who is able to access particular buttons (here, modules)
     req(session$userData$email == 'tycho.brahe@tychobra.com')
-    
+
     showModal(
       modalDialog(
         h3(
@@ -28,37 +28,38 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
         title = modal_title,
         size = "m",
         footer = list(
+          modalButton("Cancel"),
           actionButton(
-            ns("delete_button"),
+            ns("submit_delete"),
             "Delete Car",
-            style="color: #fff; background-color: #dd4b39; border-color: #d73925"),
-          modalButton("Cancel")
+            style="color: #fff; background-color: #dd4b39; border-color: #d73925"
+          )
         )
       )
     )
   })
-  
-  observeEvent(input$delete_button, {
+
+  observeEvent(input$submit_delete, {
     req(modal_trigger())
-    
+
     removeModal()
-    
+
     tryCatch({
 
       uid <- as.character(modal_trigger())
 
       DBI::dbExecute(
-        session$userData$conn,
+        conn,
         "DELETE FROM mtcars WHERE uid=$1",
         params = c(uid)
       )
-      
-      session$userData$db_trigger(session$userData$db_trigger() + 1)
+
+      session$userData$mtcars_trigger(session$userData$mtcars_trigger() + 1)
       shinytoastr::toastr_success("Car Successfully Deleted")
     }, error = function(error) {
-      
+
       shinytoastr::toastr_error("Error Deleting Car")
-      
+
       print(error)
     })
   })

@@ -15,15 +15,15 @@
 #' @param car_to_edit reactive returning a 1 row data frame of the car to edit
 #' from the "mt_cars" table
 #' @param modal_trigger reactive trigger to open the modal (Add or Edit buttons)
-#' 
+#'
 #' @return None
 
 car_edit_module <- function(input, output, session, modal_title, car_to_edit, modal_trigger) {
   ns <- session$ns
-  
+
   observeEvent(modal_trigger(), {
     hold <- car_to_edit()
-    
+
     showModal(
       modalDialog(
         fluidRow(
@@ -129,11 +129,11 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
       )
     )
   })
-  
+
   # Observe event for "Model" text input in Add/Edit Car Modal
   # `shinyFeedback`
   observeEvent(input$model, {
-    
+
     if (input$model == "") {
       shinyFeedback::showFeedbackDanger(
         "model",
@@ -171,16 +171,16 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
 
     if (is.null(hold)) {
       # adding a new car
-      
+
       out$data$created_at <- time_now
       out$data$created_by <- session$userData$email
     } else {
       # Editing existing car
-      
+
       out$data$created_at <- as.character(hold$created_at)
       out$data$created_by <- hold$created_by
     }
-    
+
     out$data$modified_at <- time_now
     out$data$modified_by <- session$userData$email
 
@@ -200,13 +200,13 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
     dat <- validate_edit()
 
     tryCatch({
-      
+
       if (is.na(dat$uid)) {
         # creating a new car
         uid <- digest::digest(Sys.time())
 
         dbExecute(
-          session$userData$conn,
+          conn,
           "INSERT INTO mtcars (uid, model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am,
           gear, carb, created_at, created_by, modified_at, modified_by) VALUES
           ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
@@ -218,9 +218,9 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
       } else {
         # editing an existing car
         dbExecute(
-          session$userData$conn,
+          conn,
           "UPDATE mtcars SET model=$1, mpg=$2, cyl=$3, disp=$4, hp=$5, drat=$6,
-          wt=$7, qsec=$8, vs=$9, am=$10, gear=$11, carb=$12, created_at=$13, created_by=$14, 
+          wt=$7, qsec=$8, vs=$9, am=$10, gear=$11, carb=$12, created_at=$13, created_by=$14,
           modified_at=$15, modified_by=$16 WHERE uid=$17",
           params = c(
             unname(dat$data),
@@ -229,10 +229,10 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
         )
       }
 
-      session$userData$db_trigger(session$userData$db_trigger() + 1)
-      shinytoastr::toastr_success(paste0(modal_title, " Success"))
+      session$userData$mtcars_trigger(session$userData$mtcars_trigger() + 1)
+      shinytoastr::toastr_success(paste0(modal_title, " Successs"))
     }, error = function(error) {
-      
+
       shinytoastr::toastr_error(paste0(modal_title, " Error"))
 
       print(error)
