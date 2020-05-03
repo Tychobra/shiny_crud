@@ -1,4 +1,4 @@
-ui <- fluidPage(
+fluidPage(
   shinyFeedback::useShinyFeedback(),
   shinyjs::useShinyjs(),
   # Application Title

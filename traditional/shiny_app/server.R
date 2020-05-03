@@ -1,4 +1,4 @@
-server <- function(input, output, session) {
+function(input, output, session) {
 
   # Use session$userData to store user data that will be needed throughout
   # the Shiny application
