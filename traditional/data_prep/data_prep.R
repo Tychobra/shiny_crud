@@ -2,9 +2,11 @@ library(dplyr)
 library(tidyr)
 library(tibble)
 
-# Create dataframe from 'mtcars' built-in dataset
-mtcars <- mtcars
+# attach data frame from 'mtcars' dataset to global environment
+mtcars <- datasets::mtcars
 
+# convert the rownames to an actual column.  We suggest to never use row names, just
+# use a regular column.
 mtcars <- rownames_to_column(mtcars, var = 'model')
 
 # Converting Weight (i.e. 'wt') from 1000's of lbs to lbs
@@ -19,4 +21,4 @@ mtcars <- mtcars %>%
   )
 
 
-saveRDS(mtcars, file = 'traditional/data_prep/prepped/mtcars.RDS')
+saveRDS(mtcars, file = 'data_prep/prepped/mtcars.RDS')

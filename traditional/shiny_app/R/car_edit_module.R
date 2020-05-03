@@ -7,7 +7,7 @@
 #' @importFrom shinyFeedback showFeedbackDanger hideFeedback
 #' @importFrom shinyjs enable disable
 #' @importFrom lubridate with_tz
-#' @importFrom digest digest
+#' @importFrom uuid UUIDgenerate
 #' @importFrom DBI dbExecute
 #' @importFrom shinytoastr toastr_success toastr_error
 #'
@@ -203,7 +203,7 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
 
       if (is.na(dat$uid)) {
         # creating a new car
-        uid <- digest::digest(Sys.time())
+        uid <- uuid::UUIDgenerate()
 
         dbExecute(
           conn,
