@@ -67,14 +67,21 @@ cars_table_module <- function(input, output, session) {
   cars <- reactive({
     session$userData$mtcars_trigger()
 
-    conn %>%
-      tbl('mtcars') %>%
-      collect() %>%
-      mutate(
-        created_at = as.POSIXct(created_at, tz = "UTC"),
-        modified_at = as.POSIXct(modified_at, tz = "UTC")
-      ) %>%
-      arrange(desc(modified_at))
+    tryCatch({
+      out <- conn %>%
+        tbl('mtcars') %>%
+        collect() %>%
+        mutate(
+          created_at = as.POSIXct(created_at, tz = "UTC"),
+          modified_at = as.POSIXct(modified_at, tz = "UTC")
+        ) %>%
+        arrange(desc(modified_at))
+    }, error = function(err) {
+      print(err)
+      showToast("error", "Database Connection Error")
+    })
+
+    out
   })
 
 
