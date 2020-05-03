@@ -1,13 +1,14 @@
+# Library in packages used in this application
 library(shiny)
 library(DT)
-library(dplyr)
 library(DBI)
 library(RSQLite)
 library(shinyjs)
 library(shinycssloaders)
-library(shinydashboard)
 library(lubridate)
 library(shinyFeedback)
+library(dplyr)
+library(dbplyr)
 
 
 conn <- dbConnect(
