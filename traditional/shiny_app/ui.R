@@ -1,5 +1,4 @@
 ui <- fluidPage(
-  shinytoastr::useToastr(),
   shinyFeedback::useShinyFeedback(),
   shinyjs::useShinyjs(),
   # Application Title

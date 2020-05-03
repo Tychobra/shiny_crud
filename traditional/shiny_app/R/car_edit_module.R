@@ -234,10 +234,10 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
       }
 
       session$userData$mtcars_trigger(session$userData$mtcars_trigger() + 1)
-      shinytoastr::toastr_success(paste0(modal_title, " Successs"))
+      showToast("success", paste0(modal_title, " Successs"))
     }, error = function(error) {
 
-      shinytoastr::toastr_error(paste0(modal_title, " Error"))
+      showToast("error", paste0(modal_title, " Error"))
 
       print(error)
     })

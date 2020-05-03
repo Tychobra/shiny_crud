@@ -55,10 +55,10 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
       )
 
       session$userData$mtcars_trigger(session$userData$mtcars_trigger() + 1)
-      shinytoastr::toastr_success("Car Successfully Deleted")
+      showToast("success", "Car Successfully Deleted")
     }, error = function(error) {
 
-      shinytoastr::toastr_error("Error Deleting Car")
+      showToast("error", "Error Deleting Car")
 
       print(error)
     })
