@@ -7,9 +7,7 @@ library(shinyjs)
 library(shinycssloaders)
 library(shinyWidgets)
 library(shinydashboard)
-library(tychobratools)
 library(lubridate)
-library(shinytoastr)
 library(shinyFeedback)
 
 

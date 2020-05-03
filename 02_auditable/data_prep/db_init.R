@@ -1,17 +1,18 @@
 library(RSQLite)
 library(DBI)
-library(tibble)
+library(dplyr)
 
 # Create a connection object with SQLite
 conn <- dbConnect(
   RSQLite::SQLite(),
-  'transactional/shiny_app/data/mtcars.sqlite3'
+  'shiny_app/data/mtcars.sqlite3'
 )
 
 # Create a query to prepare the 'mtcars' table with additional 'uid', 'id',
 # & the 4 created/modified columns
 create_mtcars_query = "CREATE TABLE mtcars (
-  uid                             SERIAL PRIMARY KEY,
+  uid                             TEXT PRIMARY KEY,
+  id_                             TEXT,
   model                           TEXT,
   mpg                             REAL,
   cyl                             REAL,
@@ -38,15 +39,16 @@ dbExecute(conn, "DROP TABLE IF EXISTS mtcars")
 dbExecute(conn, create_mtcars_query)
 
 # Read in the RDS file created in 'data_prep.R'
-dat <- readRDS("transactional/data_prep/prepped/mtcars.RDS")
+dat <- readRDS("data_prep/prepped/mtcars.RDS")
 
-# Create 'id' column in 'dat' dataframe
-uids <- lapply(1:nrow(dat), function(row_num) {
-  row_data <- digest::digest(dat[row_num, ])
-})
+# add uid column to the `dat` data frame.  This will be unique to each row.
+dat$uid <- uuid::UUIDgenerate(n = nrow(dat))
 
-# add uid column to the `dat` data frame
-dat$uid <- unlist(uids)
+# Create an id for each car.  When we make edits to a car we will insert an entire
+# new row for the car.  We will use this id_ column to uniquly identify each car.
+# To get the current data, we query for the most recently modified row for each
+# unique id_.
+dat$id_ <- uuid::UUIDgenerate(n = nrow(dat))
 
 # reorder the columns so `uid` is 1st
 dat <- dat %>%

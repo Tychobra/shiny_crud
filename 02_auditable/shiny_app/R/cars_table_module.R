@@ -2,17 +2,17 @@
 #'
 #' The UI portion of the module for displaying the mtcars datatable
 #'
-#' @importFrom shiny NS tagList fluidRow column actionButton tags 
+#' @importFrom shiny NS tagList fluidRow column actionButton tags
 #' @importFrom DT DTOutput
 #' @importFrom shinycssloaders withSpinner
 #'
 #' @param id The id for this module
-#' 
+#'
 #' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
 
 cars_table_module_ui <- function(id) {
   ns <- NS(id)
-  
+
   tagList(
     fluidRow(
       column(
@@ -48,42 +48,56 @@ cars_table_module_ui <- function(id) {
 #'
 #' The Server portion of the module for displaying the mtcars datatable
 #'
-#' @importFrom shiny reactive reactiveVal observeEvent req callModule eventReactive 
+#' @importFrom shiny reactive reactiveVal observeEvent req callModule eventReactive
 #' @importFrom DT renderDT datatable replaceData dataTableProxy
 #' @importFrom dplyr tbl collect mutate arrange select filter pull
 #' @importFrom purrr map_chr
 #' @importFrom tibble tibble
 #'
 #' @param None
-#' 
+#'
 #' @return None
 
 cars_table_module <- function(input, output, session) {
-  
+
   # Read in "mtcars" table from the database
   cars <- reactive({
     session$userData$db_trigger()
-    
-    session$userData$conn %>%
-      tbl('mtcars') %>%
-      collect() %>%
-      # Filter out deleted rows from database `mtcars` table
-      filter(is_deleted == FALSE) %>%
-      mutate(
-        created_at = as.POSIXct(created_at, tz = "UTC"),
-        modified_at = as.POSIXct(modified_at, tz = "UTC")
-      ) %>%
-      arrange(desc(modified_at))
+
+    tryCatch({
+      session$userData$conn %>%
+        tbl('mtcars') %>%
+        select(-uid) %>%
+        collect() %>%
+        mutate(
+          created_at = as.POSIXct(created_at, tz = "UTC"),
+          modified_at = as.POSIXct(modified_at, tz = "UTC")
+        ) %>%
+        # find the most recently modified row for each car
+        group_by(id_) %>%
+        filter(modified_at == max(modified_at)) %>%
+        ungroup() %>%
+        # filter out deleted cars
+        filter(is_deleted == FALSE) %>%
+        arrange(desc(modified_at))
+
+    }, error = function(err) {
+
+      print(err)
+      showToast("error", "Database Connection Error")
+
+    })
+
   })
-  
-  
+
+
   car_table_prep <- reactiveVal(NULL)
-  
+
   observeEvent(cars(), {
     out <- cars()
-    
-    ids <- out$uid
-    
+
+    ids <- out$id_
+
     actions <- purrr::map_chr(ids, function(id_) {
       paste0(
         '<div class="btn-group" style="width: 75px;" role="group" aria-label="Basic example">
@@ -92,35 +106,35 @@ cars_table_module <- function(input, output, session) {
         </div>'
       )
     })
-    
-    # Remove the `uid` column. We don't want to show this column to the user
+
+    # Remove the `id_` and `is_deleted` columns. We don't want to show this column to the user
     out <- out %>%
-      select(-uid, -is_deleted)
-    
+      select(-id_, -is_deleted)
+
     # Set the Action Buttons row to the first column of the `mtcars` table
     out <- cbind(
       tibble(" " = actions),
       out
     )
-    
+
     if (is.null(car_table_prep())) {
       # loading data into the table for the first time, so we render the entire table
       # rather than using a DT proxy
       car_table_prep(out)
-      
+
     } else {
-      
+
       # table has already rendered, so use DT proxy to update the data in the
       # table without rerendering the entire table
       replaceData(car_table_proxy, out, resetPaging = FALSE, rownames = FALSE)
-      
+
     }
   })
-  
+
   output$car_table <- renderDT({
     req(car_table_prep())
     out <- car_table_prep()
-    
+
     datatable(
       out,
       rownames = FALSE,
@@ -155,11 +169,11 @@ cars_table_module <- function(input, output, session) {
         columns = c("created_at", "modified_at"),
         method = 'toLocaleString'
       )
-    
+
   })
-  
+
   car_table_proxy <- DT::dataTableProxy('car_table')
-  
+
   callModule(
     car_edit_module,
     "add_car",
@@ -167,13 +181,13 @@ cars_table_module <- function(input, output, session) {
     car_to_edit = function() NULL,
     modal_trigger = reactive({input$add_car})
   )
-  
+
   car_to_edit <- eventReactive(input$car_id_to_edit, {
-    
+
     cars() %>%
-      filter(uid == input$car_id_to_edit)
+      filter(id_ == input$car_id_to_edit)
   })
-  
+
   callModule(
     car_edit_module,
     "edit_car",
@@ -181,16 +195,12 @@ cars_table_module <- function(input, output, session) {
     car_to_edit = car_to_edit,
     modal_trigger = reactive({input$car_id_to_edit})
   )
-  
+
   car_to_delete <- eventReactive(input$car_id_to_delete, {
-    
-    out <- cars() %>%
-      filter(uid == input$car_id_to_delete) %>%
-      pull(model)
-    
-    out <- as.character(out)
+    cars() %>%
+      filter(id_ == input$car_id_to_delete)
   })
-  
+
   callModule(
     car_delete_module,
     "delete_car",
@@ -198,5 +208,5 @@ cars_table_module <- function(input, output, session) {
     car_to_delete = car_to_delete,
     modal_trigger = reactive({input$car_id_to_delete})
   )
-  
+
 }

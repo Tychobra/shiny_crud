@@ -7,23 +7,23 @@
 #' @importFrom shinyFeedback showFeedbackDanger hideFeedback
 #' @importFrom shinyjs enable disable
 #' @importFrom lubridate with_tz
-#' @importFrom digest digest
+#' @importFrom uuid UUIDgenerate
 #' @importFrom DBI dbExecute
-#' @importFrom shinytoastr toastr_success toastr_error
+#' @importFrom shinyFeedback showToast
 #'
 #' @param modal_title string - the title for the modal
 #' @param car_to_edit reactive returning a 1 row data frame of the car to edit
 #' from the "mt_cars" table
 #' @param modal_trigger reactive trigger to open the modal (Add or Edit buttons)
-#' 
+#'
 #' @return None
 
 car_edit_module <- function(input, output, session, modal_title, car_to_edit, modal_trigger) {
   ns <- session$ns
-  
+
   observeEvent(modal_trigger(), {
     hold <- car_to_edit()
-    
+
     showModal(
       modalDialog(
         fluidRow(
@@ -128,117 +128,103 @@ car_edit_module <- function(input, output, session, modal_title, car_to_edit, mo
         )
       )
     )
+
+    # Observe event for "Model" text input in Add/Edit Car Modal
+    # `shinyFeedback`
+    observeEvent(input$model, {
+
+      if (input$model == "") {
+        shinyFeedback::showFeedbackDanger(
+          "model",
+          text = "Must enter model of car!"
+        )
+        shinyjs::disable('submit')
+      } else {
+        shinyFeedback::hideFeedback("model")
+        shinyjs::enable('submit')
+      }
+    })
   })
-  
-  # Observe event for "Model" text input in Add/Edit Car Modal
-  # `shinyFeedback`
-  observeEvent(input$model, {
-    
-    if (input$model == "") {
-      shinyFeedback::showFeedbackDanger(
-        "model",
-        text = "Must enter model of car!"
-      )
-      shinyjs::disable('submit')
-    } else {
-      shinyFeedback::hideFeedback("model")
-      shinyjs::enable('submit')
-    }
-  })
-  
+
+
+
   edit_car_dat <- reactive({
     hold <- car_to_edit()
-    
+
     out <- list(
-      uid = if (is.null(hold)) NA else hold$uid,
-      data = list(
-        "model" = input$model,
-        "mpg" = input$mpg,
-        "cyl" = input$cyl,
-        "disp" = input$disp,
-        "hp" = input$hp,
-        "drat" = input$drat,
-        "wt" = input$wt,
-        "qsec" = input$qsec,
-        "vs" = input$vs,
-        "am" = input$am,
-        "gear" = input$gear,
-        "carb" = input$carb
-      )
+      "id_" = if (is.null(hold)) uuid::UUIDgenerate() else hold$id_,
+      "model" = input$model,
+      "mpg" = input$mpg,
+      "cyl" = input$cyl,
+      "disp" = input$disp,
+      "hp" = input$hp,
+      "drat" = input$drat,
+      "wt" = input$wt,
+      "qsec" = input$qsec,
+      "vs" = input$vs,
+      "am" = input$am,
+      "gear" = input$gear,
+      "carb" = input$carb
     )
-    
+
     time_now <- as.character(lubridate::with_tz(Sys.time(), tzone = "UTC"))
-    
+
     if (is.null(hold)) {
       # adding a new car
-      
-      out$data$created_at <- time_now
-      out$data$created_by <- session$userData$email
+
+      out$created_at <- time_now
+      out$created_by <- session$userData$email
     } else {
       # Editing existing car
-      
-      out$data$created_at <- as.character(hold$created_at)
-      out$data$created_by <- hold$created_by
+
+      out$created_at <- as.character(hold$created_at)
+      out$created_by <- hold$created_by
     }
-    
-    out$data$modified_at <- time_now
-    out$data$modified_by <- session$userData$email
-    
-    out$data$is_deleted <- FALSE
-    
+
+    out$modified_at <- time_now
+    out$modified_by <- session$userData$email
+
+    out$is_deleted <- FALSE
+
     out
   })
-  
+
   validate_edit <- eventReactive(input$submit, {
     dat <- edit_car_dat()
-    
+
     # Logic to validate inputs...
-    
+
     dat
   })
-  
+
   observeEvent(validate_edit(), {
     removeModal()
     dat <- validate_edit()
-    
+
     tryCatch({
-      
-      if (is.na(dat$uid)) {
-        # creating a new car
-        uid <- digest::digest(Sys.time())
-        
-        dbExecute(
-          session$userData$conn,
-          "INSERT INTO mtcars (uid, model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am,
-          gear, carb, created_at, created_by, modified_at, modified_by, is_deleted) VALUES
-          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
-          params = c(
-            list(uid),
-            unname(dat$data)
-          )
+
+      # creating a new car
+      uid <- uuid::UUIDgenerate()
+
+      dbExecute(
+        session$userData$conn,
+        "INSERT INTO mtcars (uid, id_, model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am,
+        gear, carb, created_at, created_by, modified_at, modified_by, is_deleted) VALUES
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
+        params = c(
+          list(uid),
+          unname(dat)
         )
-      } else {
-        # editing an existing car
-        dbExecute(
-          session$userData$conn,
-          "UPDATE mtcars SET model=$1, mpg=$2, cyl=$3, disp=$4, hp=$5, drat=$6,
-          wt=$7, qsec=$8, vs=$9, am=$10, gear=$11, carb=$12, created_at=$13, created_by=$14, 
-          modified_at=$15, modified_by=$16, is_deleted=$17 WHERE uid=$18",
-          params = c(
-            unname(dat$data),
-            list(dat$uid)
-          )
-        )
-      }
-      
+      )
+
       session$userData$db_trigger(session$userData$db_trigger() + 1)
-      shinytoastr::toastr_success(paste0(modal_title, " Success"))
+      showToast("success", paste0(modal_title, " Success"))
     }, error = function(error) {
-      
-      shinytoastr::toastr_error(paste0(modal_title, " Error"))
-      
+
+      showToast("error", paste0(modal_title, " Error"))
+
       print(error)
     })
   })
-  
+
 }
