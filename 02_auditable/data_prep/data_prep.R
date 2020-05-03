@@ -3,13 +3,13 @@ library(tidyr)
 library(tibble)
 
 # Create dataframe from 'mtcars' built-in dataset
-mtcars <- mtcars
+mtcars <- datasets::mtcars
 
 mtcars <- rownames_to_column(mtcars, var = 'model')
 
 # Converting Weight (i.e. 'wt') from 1000's of lbs to lbs
 mtcars$wt <- mtcars$wt * 1000
-  
+
 
 # Converting binary values to intended, character values
 mtcars <- mtcars %>%
