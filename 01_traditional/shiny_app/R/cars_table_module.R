@@ -164,7 +164,7 @@ cars_table_module <- function(input, output, session) {
         method = 'toLocaleString'
       )
 
-  }, server = FALSE)
+  })
 
   car_table_proxy <- DT::dataTableProxy('car_table')
 
