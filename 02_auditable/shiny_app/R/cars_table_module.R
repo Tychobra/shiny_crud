@@ -65,7 +65,7 @@ cars_table_module <- function(input, output, session) {
     session$userData$db_trigger()
 
     tryCatch({
-      session$userData$conn %>%
+      conn %>%
         tbl('mtcars') %>%
         select(-uid) %>%
         collect() %>%
