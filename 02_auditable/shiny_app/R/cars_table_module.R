@@ -65,7 +65,7 @@ cars_table_module <- function(input, output, session) {
     session$userData$db_trigger()
 
     tryCatch({
-      conn %>%
+      out <- conn %>%
         tbl('mtcars') %>%
         select(-uid) %>%
         collect() %>%
@@ -78,7 +78,7 @@ cars_table_module <- function(input, output, session) {
         filter(modified_at == max(modified_at)) %>%
         ungroup() %>%
         # filter out deleted cars
-        filter(is_deleted == FALSE) %>%
+        filter(is_deleted == 0) %>%
         arrange(desc(modified_at))
 
     }, error = function(err) {
@@ -88,6 +88,7 @@ cars_table_module <- function(input, output, session) {
 
     })
 
+    out
   })
 
 
