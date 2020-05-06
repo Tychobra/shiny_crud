@@ -52,7 +52,7 @@ dat$id_ <- uuid::UUIDgenerate(n = nrow(dat))
 
 # reorder the columns so `uid` is 1st
 dat <- dat %>%
-  select(uid, everything())
+  select(uid, id_, everything())
 
 # Fill in the SQLite table with the values from the RDS file
 DBI::dbWriteTable(
