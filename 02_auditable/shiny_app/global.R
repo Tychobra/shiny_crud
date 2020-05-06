@@ -1,8 +1,8 @@
 # Library in packages used in this application
 library(shiny)
 library(DT)
-library(DBI)
 library(RSQLite)
+library(DBI)
 library(shinyjs)
 library(shinycssloaders)
 library(lubridate)
@@ -11,7 +11,7 @@ library(dplyr)
 library(dbplyr)
 
 
-conn <- dbConnect(
+conn <- DBI::dbConnect(
   RSQLite::SQLite(),
   dbname = 'data/mtcars.sqlite3'
 )

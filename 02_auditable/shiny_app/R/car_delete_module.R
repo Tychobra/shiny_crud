@@ -22,17 +22,29 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
 
     showModal(
       modalDialog(
-        h3(
-          paste("Are you sure you want to delete the information for the", car_to_delete()$model, "car?")
+        div(
+          style = "padding: 30px;",
+          class = "text-center",
+          h2(
+            style = "line-height: 1.75;",
+            paste0(
+              'Are you sure you want to delete the "',
+              car_to_delete()$model,
+              '"?'
+            )
+          )
         ),
+        br(),
         title = modal_title,
         size = "m",
         footer = list(
+          modalButton("Cancel"),
           actionButton(
             ns("delete_button"),
             "Delete Car",
-            style="color: #fff; background-color: #dd4b39; border-color: #d73925"),
-          modalButton("Cancel")
+            class = "btn-danger",
+            style = "color: #FFF;"
+          )
         )
       )
     )
@@ -47,16 +59,16 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
 
     car_out <- car_to_delete()
 
-    car_out$is_deleted <- TRUE
+    car_out$created_at <- as.character(lubridate::with_tz(car_out$created_at, tzone = "UTC"))
     car_out$modified_at <- as.character(lubridate::with_tz(Sys.time(), tzone = "UTC"))
     car_out$modified_by <- session$userData$email
-    car_out$created_at <- as.character(car_out$created_at)
+    car_out$is_deleted <- 1
 
     tryCatch({
 
       uid <- uuid::UUIDgenerate()
 
-      dbExecute(
+      DBI::dbExecute(
         conn,
         "INSERT INTO mtcars (uid, id_, model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am,
         gear, carb, created_at, created_by, modified_at, modified_by, is_deleted) VALUES
