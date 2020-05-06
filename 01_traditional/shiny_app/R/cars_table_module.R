@@ -194,9 +194,7 @@ cars_table_module <- function(input, output, session) {
 
     out <- cars() %>%
       filter(uid == input$car_id_to_delete) %>%
-      pull(model)
-
-    out <- as.character(out)
+      as.list()
   })
 
   callModule(

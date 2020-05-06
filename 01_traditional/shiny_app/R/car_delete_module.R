@@ -22,8 +22,17 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
 
     showModal(
       modalDialog(
-        h3(
-          paste("Are you sure you want to delete the information for the", car_to_delete(), "car?")
+        div(
+          style = "padding: 30px;",
+          class = "text-center",
+          h2(
+            style = "line-height: 1.75;",
+            paste0(
+              'Are you sure you want to delete the "',
+              car_to_delete()$model,
+              '"?'
+            )
+          )
         ),
         title = modal_title,
         size = "m",
@@ -40,13 +49,13 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
   })
 
   observeEvent(input$submit_delete, {
-    req(modal_trigger())
+    req(car_to_delete())
 
     removeModal()
 
     tryCatch({
 
-      uid <- as.character(modal_trigger())
+      uid <- car_to_delete()$uid
 
       DBI::dbExecute(
         conn,
