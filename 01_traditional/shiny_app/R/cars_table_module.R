@@ -67,6 +67,7 @@ cars_table_module <- function(input, output, session) {
   cars <- reactive({
     session$userData$mtcars_trigger()
 
+    out <- NULL
     tryCatch({
       out <- conn %>%
         tbl('mtcars') %>%
