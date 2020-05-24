@@ -41,7 +41,8 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
           actionButton(
             ns("submit_delete"),
             "Delete Car",
-            style="color: #fff; background-color: #dd4b39; border-color: #d73925"
+            class = "btn-danger",
+            style="color: #fff;"
           )
         )
       )
