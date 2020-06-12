@@ -21,4 +21,4 @@ mtcars <- mtcars %>%
   )
 
 
-saveRDS(mtcars, file = 'data_prep/prepped/mtcars.RDS')
+saveRDS(mtcars, file = '01_traditional/data_prep/prepped/mtcars.RDS')

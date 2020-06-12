@@ -5,7 +5,7 @@ library(dplyr)
 # Create a connection object with SQLite
 conn <- dbConnect(
   RSQLite::SQLite(),
-  'shiny_app/data/mtcars.sqlite3'
+  '02_auditable/shiny_app/data/mtcars.sqlite3'
 )
 
 # Create a query to prepare the 'mtcars' table with additional 'uid', 'id',
@@ -39,7 +39,7 @@ dbExecute(conn, "DROP TABLE IF EXISTS mtcars")
 dbExecute(conn, create_mtcars_query)
 
 # Read in the RDS file created in 'data_prep.R'
-dat <- readRDS("data_prep/prepped/mtcars.RDS")
+dat <- readRDS("02_auditable/data_prep/prepped/mtcars.RDS")
 
 # add uid column to the `dat` data frame.  This will be unique to each row.
 dat$uid <- uuid::UUIDgenerate(n = nrow(dat))
