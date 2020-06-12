@@ -111,7 +111,7 @@ cars_table_module <- function(input, output, session) {
       tibble(" " = actions),
       out
     )
-
+    
     if (is.null(car_table_prep())) {
       # loading data into the table for the first time, so we render the entire table
       # rather than using a DT proxy
@@ -119,6 +119,9 @@ cars_table_module <- function(input, output, session) {
 
     } else {
 
+      # manually hide the tooltip from the row so that it doesn't get stuck
+      # when the row is deleted
+      shinyjs::runjs("$('.btn-sm').tooltip('hide')")
       # table has already rendered, so use DT proxy to update the data in the
       # table without rerendering the entire table
       replaceData(car_table_proxy, out, resetPaging = FALSE, rownames = FALSE)
