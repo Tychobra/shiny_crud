@@ -9,7 +9,7 @@
 #' @param id The id for this module
 #'
 #' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
-
+#'
 cars_table_module_ui <- function(id) {
   ns <- NS(id)
 
@@ -111,7 +111,7 @@ cars_table_module <- function(input, output, session) {
       tibble(" " = actions),
       out
     )
-    
+
     if (is.null(car_table_prep())) {
       # loading data into the table for the first time, so we render the entire table
       # rather than using a DT proxy

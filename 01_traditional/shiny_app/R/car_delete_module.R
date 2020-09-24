@@ -3,16 +3,16 @@
 #'
 #' This module is for deleting a row's information from the mtcars database file
 #'
-#' @importFrom  shiny observeEvent req showModal h3 modalDialog removeModal actionButton modalButton
+#' @importFrom shiny observeEvent req showModal h3 modalDialog removeModal actionButton modalButton
 #' @importFrom DBI dbExecute
-#' @importFrom shinytoastr toastr_success toastr_error
+#' @importFrom shinyFeedback showToast
 #'
 #' @param modal_title string - the title for the modal
 #' @param car_to_delete string - the model of the car to be deleted
 #' @param modal_trigger reactive trigger to open the modal (Delete button)
 #'
 #' @return None
-
+#'
 car_delete_module <- function(input, output, session, modal_title, car_to_delete, modal_trigger) {
   ns <- session$ns
   # Observes trigger for this module (here, the Delete Button)
