@@ -78,8 +78,16 @@ cars_table_module <- function(input, output, session) {
         ) %>%
         arrange(desc(modified_at))
     }, error = function(err) {
-      print(err)
-      showToast("error", "Database Connection Error")
+
+
+      msg <- "Database Connection Error"
+      # print `msg` so that we can find it in the logs
+      print(msg)
+      # print the actual error to log it
+      print(error)
+      # show error `msg` to user.  User can then tell us about error and we can
+      # quickly identify where it cam from based on the value in `msg`
+      showToast("error", msg)
     })
 
     out

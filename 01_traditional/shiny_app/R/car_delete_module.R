@@ -68,9 +68,14 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
       showToast("success", "Car Successfully Deleted")
     }, error = function(error) {
 
-      showToast("error", "Error Deleting Car")
-
+      msg <- "Error Deleting Car"
+      # print `msg` so that we can find it in the logs
+      print(msg)
+      # print the actual error to log it
       print(error)
+      # show error `msg` to user.  User can then tell us about error and we can
+      # quickly identify where it cam from based on the value in `msg`
+      showToast("error", msg)
     })
   })
 }
