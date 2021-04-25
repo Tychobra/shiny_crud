@@ -1,0 +1,4 @@
+default:
+  app_name: "yssup_crud"
+  db:
+    dbname: 'data/mtcars.sqlite3'
