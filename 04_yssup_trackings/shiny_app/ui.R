@@ -3,9 +3,10 @@ fluidPage(
   shinyjs::useShinyjs(),
   # Application Title
   titlePanel(
-    h1("Shiny CRUD Application", align = 'center'),
-    windowTitle = "Shiny CRUD Application"
+    h1("Explore Yssup records", align = 'center'),
+    windowTitle = "yssup database"
   ),
-  cars_table_module_ui("cars_table")
+  yssup_table_module_ui("yssup_table")
 )
 
+## aggiungi dynamic plots 

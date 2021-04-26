@@ -1,24 +1,24 @@
 
-#' Car Delete Module
+#' Yssup Delete Module
 #'
-#' This module is for deleting a row's information from the mtcars database file
+#' This module is for deleting a row's information from the yssup database file
 #'
 #' @importFrom shiny observeEvent req showModal h3 modalDialog removeModal actionButton modalButton
 #' @importFrom DBI dbExecute
 #' @importFrom shinyFeedback showToast
 #'
 #' @param modal_title string - the title for the modal
-#' @param car_to_delete string - the model of the car to be deleted
+#' @param yssup_to_delete string - the model of the yssup to be deleted
 #' @param modal_trigger reactive trigger to open the modal (Delete button)
 #'
 #' @return None
 #'
-car_delete_module <- function(input, output, session, modal_title, car_to_delete, modal_trigger) {
+yssup_delete_module <- function(input, output, session, modal_title, yssup_to_delete, modal_trigger) {
   ns <- session$ns
   # Observes trigger for this module (here, the Delete Button)
   observeEvent(modal_trigger(), {
     # Authorize who is able to access particular buttons (here, modules)
-    req(session$userData$email == 'tycho.brahe@tychobra.com')
+    req(session$userData$email == 'niccolo.salvini27@gmail.com')
 
     showModal(
       modalDialog(
@@ -29,7 +29,7 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
             style = "line-height: 1.75;",
             paste0(
               'Are you sure you want to delete the "',
-              car_to_delete()$model,
+              yssup_to_delete()$model,
               '"?'
             )
           )
@@ -40,7 +40,7 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
           modalButton("Cancel"),
           actionButton(
             ns("submit_delete"),
-            "Delete Car",
+            "Delete yssup",
             class = "btn-danger",
             style="color: #fff;"
           )
@@ -50,25 +50,25 @@ car_delete_module <- function(input, output, session, modal_title, car_to_delete
   })
 
   observeEvent(input$submit_delete, {
-    req(car_to_delete())
+    req(yssup_to_delete())
 
     removeModal()
 
     tryCatch({
 
-      uid <- car_to_delete()$uid
+      uid <- yssup_to_delete()$uid
 
       DBI::dbExecute(
         conn,
-        "DELETE FROM mtcars WHERE uid=$1",
+        "DELETE FROM yssup WHERE uid=$1",
         params = c(uid)
       )
 
-      session$userData$mtcars_trigger(session$userData$mtcars_trigger() + 1)
-      showToast("success", "Car Successfully Deleted")
+      session$userData$yssup_trigger(session$userData$yssup_trigger() + 1)
+      showToast("success", "yssup Successfully Deleted")
     }, error = function(error) {
 
-      msg <- "Error Deleting Car"
+      msg <- "Error Deleting yssup"
       # print `msg` so that we can find it in the logs
       print(msg)
       # print the actual error to log it

@@ -17,4 +17,5 @@ yssup <- read_excel(here("04_yssup_trackings", "data_prep", "provided","yssup_da
   )
 
 
-saveRDS(yssup, file = '04_yssup_crud/data_prep/prepped/yssup.RDS')
+saveRDS(yssup, file = '04_yssup_trackings/data_prep/prepped/yssup.RDS')
+

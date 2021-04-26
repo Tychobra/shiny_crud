@@ -1,14 +1,15 @@
 # Library in packages used in this application
-library(shiny)
-library(DT)
-library(DBI)
-library(RSQLite)
-library(shinyjs)
-library(shinycssloaders)
-library(lubridate)
-library(shinyFeedback)
-library(dplyr)
-library(dbplyr)
+library(shiny, quietly = T, warn.conflicts = F)
+library(DT, quietly = T, warn.conflicts = F)
+library(DBI, quietly = T, warn.conflicts = F)
+library(RSQLite, quietly = T, warn.conflicts = F)
+library(shinyjs, quietly = T, warn.conflicts = F)
+library(shinycssloaders, quietly = T, warn.conflicts = F)
+library(lubridate, quietly = T, warn.conflicts = F)
+library(shinyFeedback, quietly = T, warn.conflicts = F)
+library(dplyr, quietly = T, warn.conflicts = F)
+library(dbplyr, quietly = T, warn.conflicts = F)
+## library(polised) auth login
 
 db_config <- config::get()$db
 

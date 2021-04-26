@@ -1,6 +1,6 @@
-#' Cars Table Module UI
+#' Yssup Table Module UI
 #'
-#' The UI portion of the module for displaying the mtcars datatable
+#' The UI portion of the module for displaying the yssup datatable
 #'
 #' @importFrom shiny NS tagList fluidRow column actionButton tags
 #' @importFrom DT DTOutput
@@ -10,7 +10,7 @@
 #'
 #' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
 #'
-cars_table_module_ui <- function(id) {
+yssup_table_module_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
@@ -18,7 +18,7 @@ cars_table_module_ui <- function(id) {
       column(
         width = 2,
         actionButton(
-          ns("add_car"),
+          ns("add_yssup"),
           "Add",
           class = "btn-success",
           style = "color: #fff;",
@@ -33,20 +33,20 @@ cars_table_module_ui <- function(id) {
       column(
         width = 12,
         title = "Motor Trend Car Road Tests",
-        DTOutput(ns('car_table')) %>%
+        DTOutput(ns('yssup_table')) %>%
           withSpinner(),
         tags$br(),
         tags$br()
       )
     ),
-    tags$script(src = "cars_table_module.js"),
-    tags$script(paste0("cars_table_module_js('", ns(''), "')"))
+    tags$script(src = "yssup_table_module.js"),
+    tags$script(paste0("yssup_table_module_js('", ns(''), "')"))
   )
 }
 
-#' Cars Table Module Server
+#' Yssup Table Module Server
 #'
-#' The Server portion of the module for displaying the mtcars datatable
+#' The Server portion of the module for displaying the yssup datatable
 #'
 #' @importFrom shiny reactive reactiveVal observeEvent req callModule eventReactive
 #' @importFrom DT renderDT datatable replaceData dataTableProxy
@@ -58,19 +58,19 @@ cars_table_module_ui <- function(id) {
 #'
 #' @return None
 
-cars_table_module <- function(input, output, session) {
+yssup_table_module <- function(input, output, session) {
 
-  # trigegr to reload data from the "mtcars" table
-  session$userData$mtcars_trigger <- reactiveVal(0)
+  # trigger to reload data from the "yssup" table
+  session$userData$yssup_trigger <- reactiveVal(0)
 
-  # Read in "mtcars" table from the database
-  cars <- reactive({
-    session$userData$mtcars_trigger()
+  # Read in "yssup" table from the database
+  yssup <- reactive({
+    session$userData$yssup_trigger()
 
     out <- NULL
     tryCatch({
       out <- conn %>%
-        tbl('mtcars') %>%
+        tbl('yssup') %>%
         collect() %>%
         mutate(
           created_at = as.POSIXct(created_at, tz = "UTC"),
@@ -94,10 +94,10 @@ cars_table_module <- function(input, output, session) {
   })
 
 
-  car_table_prep <- reactiveVal(NULL)
+  yssup_table_prep <- reactiveVal(NULL)
 
-  observeEvent(cars(), {
-    out <- cars()
+  observeEvent(yssup(), {
+    out <- yssup()
 
     ids <- out$uid
 
@@ -114,37 +114,48 @@ cars_table_module <- function(input, output, session) {
     out <- out %>%
       select(-uid)
 
-    # Set the Action Buttons row to the first column of the `mtcars` table
+    # Set the Action Buttons row to the first column of the `yssup` table
     out <- cbind(
       tibble(" " = actions),
       out
     )
 
-    if (is.null(car_table_prep())) {
+    if (is.null(yssup_table_prep())) {
       # loading data into the table for the first time, so we render the entire table
       # rather than using a DT proxy
-      car_table_prep(out)
+      yssup_table_prep(out)
 
     } else {
 
       # table has already rendered, so use DT proxy to update the data in the
       # table without rerendering the entire table
-      replaceData(car_table_proxy, out, resetPaging = FALSE, rownames = FALSE)
+      replaceData(yssup_table_proxy, out, resetPaging = FALSE, rownames = FALSE)
 
     }
   })
 
-  output$car_table <- renderDT({
-    req(car_table_prep())
-    out <- car_table_prep()
+  output$yssup_table <- renderDT({
+    req(yssup_table_prep())
+    out <- yssup_table_prep()
 
     datatable(
       out,
-      rownames = FALSE,
-      colnames = c('Model', 'Miles/Gallon', 'Cylinders', 'Displacement (cu.in.)',
-                   'Horsepower', 'Rear Axle Ratio', 'Weight (lbs)', '1/4 Mile Time',
-                   'Engine', 'Transmission', 'Forward Gears', 'Carburetors', 'Created At',
-                   'Created By', 'Modified At', 'Modified By'),
+      rownames = c(
+        "Arianna Presciutti", "Blandina Allegra", "Bulgarini Ginevra",
+        "Ciaramella Cecilia", "Curelli Chiara", " Disa Lucrezia",
+        "Fallani Margherita", " Fanfani Bianca", " Galli Lucrezia",
+        "Galullo Francesca", "Godereccia Ortigia", "Gramigni Margherita",
+        "Iandelli Rebecca", "Iavicoli Giulia", "Lega Irene",
+        "Maggia Lidia", "Manini Giulia", "Marchi Margherita",
+        "Marra Gaia", "Martinelli Elena", "Mengoni Matilde",
+        "Milli Caterina", "Molesti Camilla", "O Braian Tara",
+        "Paoletti Bianca", "Presciutti Ester", "Quercetti Giulia",
+        "Sottili Sofia", "Tagliafraschi Gaia", "De Vittorio Luna",
+        "Cioni Bianca", "Borri Lucrezia"
+      ),
+      colnames = c('Anzilotti Antonio', 'Baldi Duccio', 'Benci Francesco', 'Benedetti Umberto',
+                   'Consiglio Giovanni', 'Fortuna Noah', 'Leoni Emanuele', 'Maresi Matteo',
+                   'Nardi Alessandro', 'Peggion Giacomo', 'Piccini Cosimo', 'Riessler Lorenzo', 'Scialdone Pietro'),
       selection = "none",
       class = "compact stripe row-border nowrap",
       # Escape the HTML in all except 1st column (which has the buttons)
@@ -157,7 +168,7 @@ cars_table_module <- function(input, output, session) {
           list(
             extend = "excel",
             text = "Download",
-            title = paste0("mtcars-", Sys.Date()),
+            title = paste0("yssup-", Sys.Date()),
             exportOptions = list(
               columns = 1:(length(out) - 1)
             )
@@ -179,43 +190,43 @@ cars_table_module <- function(input, output, session) {
 
   })
 
-  car_table_proxy <- DT::dataTableProxy('car_table')
+  yssup_table_proxy <- DT::dataTableProxy('yssup_table')
 
   callModule(
-    car_edit_module,
-    "add_car",
-    modal_title = "Add Car",
-    car_to_edit = function() NULL,
-    modal_trigger = reactive({input$add_car})
+    yssup_edit_module,
+    "add_yssup",
+    modal_title = "Add Yssup",
+    yssup_to_edit = function() NULL,
+    modal_trigger = reactive({input$add_yssup})
   )
 
-  car_to_edit <- eventReactive(input$car_id_to_edit, {
+  yssup_to_edit <- eventReactive(input$yssup_id_to_edit, {
 
-    cars() %>%
-      filter(uid == input$car_id_to_edit)
+    yssup() %>%
+      filter(uid == input$yssup_id_to_edit)
   })
 
   callModule(
-    car_edit_module,
-    "edit_car",
-    modal_title = "Edit Car",
-    car_to_edit = car_to_edit,
-    modal_trigger = reactive({input$car_id_to_edit})
+    yssup_edit_module,
+    "edit_yssup",
+    modal_title = "Edit Yssup",
+    yssup_to_edit = yssup_to_edit,
+    modal_trigger = reactive({input$yssup_id_to_edit})
   )
 
-  car_to_delete <- eventReactive(input$car_id_to_delete, {
+  yssup_to_delete <- eventReactive(input$yssup_id_to_delete, {
 
-    out <- cars() %>%
-      filter(uid == input$car_id_to_delete) %>%
+    out <- yssup() %>%
+      filter(uid == input$yssup_id_to_delete) %>%
       as.list()
   })
 
   callModule(
-    car_delete_module,
-    "delete_car",
-    modal_title = "Delete Car",
-    car_to_delete = car_to_delete,
-    modal_trigger = reactive({input$car_id_to_delete})
+    yssup_delete_module,
+    "delete_yssup",
+    modal_title = "Delete Yssup",
+    yssup_to_delete = yssup_to_delete,
+    modal_trigger = reactive({input$yssup_id_to_delete})
   )
 
 }
