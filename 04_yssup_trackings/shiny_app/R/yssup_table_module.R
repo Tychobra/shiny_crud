@@ -140,6 +140,7 @@ yssup_table_module <- function(input, output, session) {
 
     datatable(
       out,
+      rownames = FALSE,
       # rownames = c(
       #   "Arianna Presciutti", "Blandina Allegra", "Bulgarini Ginevra",
       #   "Ciaramella Cecilia", "Curelli Chiara", " Disa Lucrezia",
@@ -153,10 +154,12 @@ yssup_table_module <- function(input, output, session) {
       #   "Sottili Sofia", "Tagliafraschi Gaia", "De Vittorio Luna",
       #   "Cioni Bianca", "Borri Lucrezia"
       # ),
-      # colnames = c('Anzilotti Antonio', 'Baldi Duccio', 'Benci Francesco', 'Benedetti Umberto',
-      #              'Consiglio Giovanni', 'Fortuna Noah', 'Leoni Emanuele', 'Maresi Matteo',
-      #              'Nardi Alessandro', 'Peggion Giacomo', 'Piccini Cosimo', 'Riessler Lorenzo', 'Scialdone Pietro',
-      #              'Created At', 'Created By', 'Modified At', 'Modified By'),
+      # colnames = c(
+      #   'Anzilotti Antonio', 'Baldi Duccio', 'Benci Francesco', 'Benedetti Umberto',
+      #   'Consiglio Giovanni', 'Fortuna Noah', 'Leoni Emanuele', 'Maresi Matteo',
+      #   'Nardi Alessandro', 'Peggion Giacomo', 'Piccini Cosimo', 'Riessler Lorenzo', 
+      #   'Scialdone Pietro', 'Created At', 'Created By', 'Modified At', 'Modified By'
+      #   ),
       selection = "none",
       class = "compact stripe row-border nowrap",
       # Escape the HTML in all except 1st column (which has the buttons)
