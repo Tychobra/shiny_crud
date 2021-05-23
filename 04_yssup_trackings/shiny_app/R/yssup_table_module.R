@@ -140,22 +140,23 @@ yssup_table_module <- function(input, output, session) {
 
     datatable(
       out,
-      rownames = c(
-        "Arianna Presciutti", "Blandina Allegra", "Bulgarini Ginevra",
-        "Ciaramella Cecilia", "Curelli Chiara", " Disa Lucrezia",
-        "Fallani Margherita", " Fanfani Bianca", " Galli Lucrezia",
-        "Galullo Francesca", "Godereccia Ortigia", "Gramigni Margherita",
-        "Iandelli Rebecca", "Iavicoli Giulia", "Lega Irene",
-        "Maggia Lidia", "Manini Giulia", "Marchi Margherita",
-        "Marra Gaia", "Martinelli Elena", "Mengoni Matilde",
-        "Milli Caterina", "Molesti Camilla", "O Braian Tara",
-        "Paoletti Bianca", "Presciutti Ester", "Quercetti Giulia",
-        "Sottili Sofia", "Tagliafraschi Gaia", "De Vittorio Luna",
-        "Cioni Bianca", "Borri Lucrezia"
-      ),
-      colnames = c('Anzilotti Antonio', 'Baldi Duccio', 'Benci Francesco', 'Benedetti Umberto',
-                   'Consiglio Giovanni', 'Fortuna Noah', 'Leoni Emanuele', 'Maresi Matteo',
-                   'Nardi Alessandro', 'Peggion Giacomo', 'Piccini Cosimo', 'Riessler Lorenzo', 'Scialdone Pietro'),
+      # rownames = c(
+      #   "Arianna Presciutti", "Blandina Allegra", "Bulgarini Ginevra",
+      #   "Ciaramella Cecilia", "Curelli Chiara", " Disa Lucrezia",
+      #   "Fallani Margherita", " Fanfani Bianca", " Galli Lucrezia",
+      #   "Galullo Francesca", "Godereccia Ortigia", "Gramigni Margherita",
+      #   "Iandelli Rebecca", "Iavicoli Giulia", "Lega Irene",
+      #   "Maggia Lidia", "Manini Giulia", "Marchi Margherita",
+      #   "Marra Gaia", "Martinelli Elena", "Mengoni Matilde",
+      #   "Milli Caterina", "Molesti Camilla", "O Braian Tara",
+      #   "Paoletti Bianca", "Presciutti Ester", "Quercetti Giulia",
+      #   "Sottili Sofia", "Tagliafraschi Gaia", "De Vittorio Luna",
+      #   "Cioni Bianca", "Borri Lucrezia"
+      # ),
+      # colnames = c('Anzilotti Antonio', 'Baldi Duccio', 'Benci Francesco', 'Benedetti Umberto',
+      #              'Consiglio Giovanni', 'Fortuna Noah', 'Leoni Emanuele', 'Maresi Matteo',
+      #              'Nardi Alessandro', 'Peggion Giacomo', 'Piccini Cosimo', 'Riessler Lorenzo', 'Scialdone Pietro',
+      #              'Created At', 'Created By', 'Modified At', 'Modified By'),
       selection = "none",
       class = "compact stripe row-border nowrap",
       # Escape the HTML in all except 1st column (which has the buttons)

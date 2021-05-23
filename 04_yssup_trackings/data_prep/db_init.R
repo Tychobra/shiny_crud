@@ -24,7 +24,11 @@ create_yssup_query = "CREATE TABLE yssup (
   peggion_giacomo                 TEXT,
   piccini_cosimo                  TEXT,
   riessler_lorenzo                TEXT,
-  scialdone_pietro                TEXT
+  scialdone_pietro                TEXT,
+  created_at                      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_by                      TEXT,
+  modified_at                     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modified_by                     TEXT
 )"
 
 # dbExecute() executes a SQL statement with a connection object
