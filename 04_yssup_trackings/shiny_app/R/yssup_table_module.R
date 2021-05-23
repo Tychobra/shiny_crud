@@ -157,7 +157,7 @@ yssup_table_module <- function(input, output, session) {
       # colnames = c(
       #   'Anzilotti Antonio', 'Baldi Duccio', 'Benci Francesco', 'Benedetti Umberto',
       #   'Consiglio Giovanni', 'Fortuna Noah', 'Leoni Emanuele', 'Maresi Matteo',
-      #   'Nardi Alessandro', 'Peggion Giacomo', 'Piccini Cosimo', 'Riessler Lorenzo', 
+      #   'Nardi Alessandro', 'Peggion Giacomo', 'Piccini Cosimo', 'Riessler Lorenzo',
       #   'Scialdone Pietro', 'Created At', 'Created By', 'Modified At', 'Modified By'
       #   ),
       selection = "none",
