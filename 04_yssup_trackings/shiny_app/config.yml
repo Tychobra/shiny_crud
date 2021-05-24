@@ -1,4 +1,0 @@
-default:
-  app_name: "yssup_crud"
-  db:
-    dbname: 'data/yssup.sqlite3'
