@@ -1,4 +1,3 @@
-
 #' Yssup Add & Edit Module
 #'
 #' Module to add & edit yssup in the yssup database file
@@ -27,43 +26,47 @@ yssup_edit_module <- function(input, output, session, modal_title, yssup_to_edit
       modalDialog(
         fluidRow(
           column(
-            width = 6,
+            width = 7,
+            textInput(
+              ns("tipette"),
+              'Tipetta',
+              value = hold$tipette
+            ),
             selectInput(
               ns("anzilotti_antonio"),
               'Anzilotti Antonio',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$anzilotti_antonio)
             ),
             selectInput(
               ns('baldi_duccio'),
               'Baldi Duccio',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$baldi_duccio)
             ),
             selectInput(
               ns('benci_francesco'),
               'Benci Francesco',
-              choices = c('Automatic', 'Manual'),
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "",hold$benci_francesco )
             ),
             selectInput(
               ns('benedetti_umberto'),
               'Benedetti Umberto',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$benedetti_umberto)
             ),
             selectInput(
               ns('consiglio_giovanni'),
               'Consiglio Giovanni',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$consiglio_giovanni)
             ),
             selectInput(
               ns('fortuna_noah'),
               'Fortuna Noah',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$fortuna_noah)
             )
           ),
           column(
@@ -72,43 +75,43 @@ yssup_edit_module <- function(input, output, session, modal_title, yssup_to_edit
               ns('leoni_emanuele'),
               'Leoni Emanuele',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "",hold$leoni_emanuele)
             ),
             selectInput(
               ns('maresi_matteo'),
               'Maresi Matteo',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$maresi_matteo)
             ),
             selectInput(
-              ns('nardi_alessandro '),
-              'Nardi Alessandro ',
+              ns('nardi_alessandro'),
+              'Nardi Alessandro',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$nardi_alessandro)
             ),
             selectInput(
               ns('peggion_giacomo'),
               'Peggion Giacomo',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$peggion_giacomo)
             ),
             selectInput(
               ns('piccini_cosimo'),
               'Piccini Cosimo',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$piccini_cosimo)
             ),
             selectInput(
               ns('riessler_lorenzo'),
               'Riessler Lorenzo',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$riessler_lorenzo)
             ),
             selectInput(
               ns('scialdone_pietro'),
               'Scialdone Pietro',
               choices = c('scopata', 'baciata', 'niente'),
-              selected = ifelse(is.null(hold), "", "niente")
+              selected = ifelse(is.null(hold), "", hold$scialdone_pietro)
             )
           )
         ),
@@ -153,6 +156,7 @@ yssup_edit_module <- function(input, output, session, modal_title, yssup_to_edit
     out <- list(
       uid = if (is.null(hold)) NA else hold$uid,
       data = list(
+        "tipette" = input$tipette,
         "anzilotti_antonio" = input$anzilotti_antonio,
         "baldi_duccio" = input$baldi_duccio,
         "benci_francesco" = input$benci_francesco,
@@ -209,10 +213,12 @@ yssup_edit_module <- function(input, output, session, modal_title, yssup_to_edit
 
         dbExecute(
           conn,
-          "INSERT INTO yssup (tipette, anzilotti_antonio, baldi_duccio, benci_francesco, benedetti_umberto,
-          consiglio_giovanni, fortuna_noah, leoni_emanuele, maresi_matteo, nardi_alessandro, peggion_giacomo, 
-          piccini_cosimo, riessler_lorenzo, scialdone_pietro , created_at, created_by, modified_at, modified_by) VALUES
-          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+          "INSERT INTO yssup (
+          uid, tipette, anzilotti_antonio, baldi_duccio, benci_francesco, benedetti_umberto,
+          consiglio_giovanni, fortuna_noah, leoni_emanuele, maresi_matteo, nardi_alessandro,
+          peggion_giacomo, piccini_cosimo, riessler_lorenzo, scialdone_pietro , created_at, 
+          created_by, modified_at, modified_by) VALUES
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
           params = c(
             list(uid),
             unname(dat$data)
@@ -222,9 +228,9 @@ yssup_edit_module <- function(input, output, session, modal_title, yssup_to_edit
         # editing an existing yssup
         dbExecute(
           conn,
-          "UPDATE yssup SET anzilotti_antonio=$1, baldi_duccio=$2, benci_francesco=$3, benedetti_umberto=$4, consiglio_giovanni=$5, fortuna_noah=$6,
-          leoni_emanuele=$7, maresi_matteo=$8, nardi_alessandro=$9, peggion_giacomo=$10, piccini_cosimo=$11, riessler_lorenzo=$12, scialdone_pietro=$13,
-          created_at=$14, created_by=$15, modified_at=$16, modified_by=$17 WHERE uid=$18",
+          "UPDATE yssup SET tipette = $1, anzilotti_antonio=$2, baldi_duccio=$3, benci_francesco=$4, benedetti_umberto=$5, consiglio_giovanni=$6, fortuna_noah=$7,
+          leoni_emanuele=$8, maresi_matteo=$9, nardi_alessandro=$10, peggion_giacomo=$11, piccini_cosimo=$12, riessler_lorenzo=$13, scialdone_pietro=$14,
+          created_at=$15, created_by=$16, modified_at=$17, modified_by=$18 WHERE uid=$19",
           params = c(
             unname(dat$data),
             list(dat$uid)
