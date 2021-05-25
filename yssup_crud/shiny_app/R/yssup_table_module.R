@@ -166,6 +166,7 @@ yssup_table_module <- function(input, output, session) {
       escape = -1,
       extensions = c("Buttons"),
       options = list(
+        "pageLength" = 20,
         scrollX = TRUE,
         dom = 'Bftip',
         buttons = list(
