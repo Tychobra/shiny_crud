@@ -29,7 +29,7 @@ yssup_delete_module <- function(input, output, session, modal_title, yssup_to_de
             style = "line-height: 1.75;",
             paste0(
               'Are you sure you want to delete the "',
-              yssup_to_delete()$model,
+              yssup_to_delete()$tipette,
               '"?'
             )
           )
