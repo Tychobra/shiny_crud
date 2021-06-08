@@ -9,4 +9,4 @@ fluidPage(
   yssup_table_module_ui("yssup_table")
 )
 
-## aggiungi dynamic plots 
+
