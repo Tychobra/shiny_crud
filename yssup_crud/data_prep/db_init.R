@@ -1,11 +1,21 @@
 library(RSQLite, warn.conflicts = F, quietly = T)
 library(tibble, warn.conflicts = F, quietly = T)
+library(RPostgres, warn.conflicts = F, quietly = T)
+library(DBI, warn.conflicts = F, quietly = T)
 
-# Create a connection object with SQLite
-conn <- dbConnect(
-  RSQLite::SQLite(),
-  dbname = "04_yssup_trackings/shiny_app/data/yssup.sqlite3"
-)
+# Create a connection object with dbi
+conn <- dbConnect(RPostgres::Postgres(),
+                 dbname = "d48t7csiftocvo", 
+                 host='ec2-52-19-96-181.eu-west-1.compute.amazonaws.com', 
+                 port="5432", 
+                 user="udknpypytovowv", 
+                 password="6c19e250350d95a8f6fbf83c3bd83ce19e701f6be6497c08a0f943c1021c357f")  
+
+# # Create a connection object with SQLite
+# conn <- dbConnect(
+#   RSQLite::SQLite(),
+#   dbname = "04_yssup_trackings/shiny_app/data/yssup.sqlite3"
+# )
 
 # Create a query to prepare the 'mtcars' table with additional 'uid', 'id',
 # & the 4 created/modified columns
@@ -38,7 +48,7 @@ dbExecute(conn, "DROP TABLE IF EXISTS yssup")
 dbExecute(conn, create_yssup_query)
 
 # Read in the RDS file created in 'data_prep.R'
-dat <- readRDS("04_yssup_trackings/data_prep/prepped/yssup.RDS")
+dat <- readRDS("yssup_crud/data_prep/prepped/yssup.RDS")
 
 # add uid column to the `dat` data frame
 dat$uid <- uuid::UUIDgenerate(n = nrow(dat))

@@ -9,15 +9,24 @@ library(lubridate, quietly = T, warn.conflicts = F)
 library(shinyFeedback, quietly = T, warn.conflicts = F)
 library(dplyr, quietly = T, warn.conflicts = F)
 library(dbplyr, quietly = T, warn.conflicts = F)
-## library(polised) auth login
 
-db_config <- config::get()$db
 
-# Create database connection
-conn <- dbConnect(
-  RSQLite::SQLite(),
-  dbname = db_config$dbname
-)
+# db_config <- config::get()$db
+
+
+conn <- dbConnect(RPostgres::Postgres(),
+                  dbname = "d48t7csiftocvo", 
+                  host='ec2-52-19-96-181.eu-west-1.compute.amazonaws.com', 
+                  port="5432", 
+                  user="udknpypytovowv", 
+                  password="6c19e250350d95a8f6fbf83c3bd83ce19e701f6be6497c08a0f943c1021c357f")  
+
+
+# # Create database connection
+# conn <- dbConnect(
+#   RSQLite::SQLite(),
+#   dbname = db_config$dbname
+# )
 
 # Stop database connection when application stops
 shiny::onStop(function() {
