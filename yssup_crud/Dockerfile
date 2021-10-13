@@ -20,7 +20,7 @@ RUN apt-get update && \
 
     
 # Download and install library
-RUN R -e "install.packages(c('shiny','config',  'DT', 'DBI', 'RSQLite', 'shinyjs', 'shinycssloaders', 'lubridate', 'shinyFeedback','dplyr', 'dbplyr'))"
+RUN R -e "install.packages(c('shiny','config',  'DT', 'DBI', 'RSQLite', 'shinyjs', 'shinycssloaders', 'lubridate', 'shinyFeedback','dplyr', 'dbplyr', 'RPostgres'))"
 
 # copy the app to the image
 COPY shiny_app /root/app

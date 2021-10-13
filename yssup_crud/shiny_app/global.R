@@ -9,6 +9,7 @@ library(lubridate, quietly = T, warn.conflicts = F)
 library(shinyFeedback, quietly = T, warn.conflicts = F)
 library(dplyr, quietly = T, warn.conflicts = F)
 library(dbplyr, quietly = T, warn.conflicts = F)
+library(RPostgres, quietly = T, warn.conflicts = F)
 
 
 # db_config <- config::get()$db
