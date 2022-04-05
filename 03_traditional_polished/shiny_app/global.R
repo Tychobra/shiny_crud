@@ -19,7 +19,7 @@ conn <- dbConnect(
   dbname = db_config$dbname
 )
 
-global_sessions_config(
+polished_config(
   app_name = "03_traditional_polished",
   api_key = "<your polished.tech API key>"
 )
